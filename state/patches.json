@@ -9,5 +9,16 @@
   "meta": 0,
   "append_only": 0,
   "same": 676326
+ },
+ {
+  "name": "patch-20261115T214156Z.tar.zst",
+  "sha256": "7eecd8377fafd2f0a4f70cf5b06acfc4c6a92a03685084f9f36236c2fdbfa0ac",
+  "created": "2026-11-15T21:41:56Z",
+  "series": 11822,
+  "new": 4831,
+  "history": 6993,
+  "meta": 0,
+  "append_only": 0,
+  "same": 669333
  }
 ]
