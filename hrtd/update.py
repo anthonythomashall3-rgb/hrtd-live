@@ -15,6 +15,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from hrtd import rule, fred, site, store
 
 WORK = os.environ.get('WORK', '/tmp/hrtd_work'); DL = WORK + '_dl'
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SITE = f'{WORK}/site/data'; STATE = f'{WORK}/state'
 MAX_MIN = float(os.environ.get('MAX_MIN', '330')); CHECK_MIN = float(os.environ.get('CHECK_MIN', '45'))
 DRY = os.environ.get('DRY') == '1'
@@ -26,6 +27,11 @@ class Run:
         self.st = pd.read_parquet(f'{STATE}/series_state.parquet').set_index('series_id')
         self.upd = {}                                       # sid -> changed state fields
         r = pd.read_parquet(f'{STATE}/rows.parquet'); self.rows = dict(zip(r.series_id, (json.loads(x) for x in r.row)))
+        self.load_maps()
+        self.shards = {}; self.dirty = set(); self.changed_files = set(); self.log = []; self.patched = set(); self.patches_applied = []
+        self.before = {'series': len(self.rows), 'prints': sum(r[12] for r in self.rows.values())}
+
+    def load_maps(self):
         ad = pd.read_parquet(f'{STATE}/agency_day.parquet'); co = pd.read_parquet(f'{STATE}/corr.parquet')
         self.maps = {'agency_day': dict(zip(zip(ad.release, ad.day), ad.evidence)),
                      'corr': {(a, b): (c, d) for a, b, c, d in zip(co.release, co.alfred_day, co.real_day, co.text)}}
@@ -33,8 +39,42 @@ class Run:
         for x in sd.itertuples(): self.side.setdefault(x.series_id, {})[x.realtime_start] = (x.found, x.release, x.evidence, x.vintage_month, x.source)
         p = pd.read_parquet(f'{STATE}/pop.parquet'); self.pop = dict(zip(p.series_id, p.popularity))
         self.fnames = json.load(open(f'{STATE}/fnames.json'))
-        self.shards = {}; self.dirty = set(); self.changed_files = set(); self.log = []
-        self.before = {'series': len(self.rows), 'prints': sum(r[12] for r in self.rows.values())}
+
+    def apply_patches(self):
+        """history patches from the Mac (tools/export_patch.py), in order, each once: records + states replace ours,
+        lookup tables and calendar replace ours; the patched series are then fetched from the patch's L (newer releases re-added)"""
+        import shutil, subprocess, tempfile
+        pl = f'{REPO}/state/patches.json'; lst = json.load(open(pl)) if os.path.exists(pl) else []
+        af = f'{STATE}/applied_patches.json'; applied = json.load(open(af)) if os.path.exists(af) else []
+        for p in lst:
+            if p['name'] in applied: continue
+            os.makedirs(DL, exist_ok=True)
+            subprocess.run(['gh', 'release', 'download', store.TAG, '-R', store.REPO, '-p', p['name'], '-D', DL, '--clobber'], check=True)
+            got = store.sha(f'{DL}/{p["name"]}')
+            if got != p['sha256']: raise RuntimeError(f'{p["name"]}: SHA-256 {got} is not {p["sha256"]}')
+            x = tempfile.mkdtemp(prefix='patch_'); subprocess.run(['tar', '--zstd', '-xf', f'{DL}/{p["name"]}', '-C', x], check=True)
+            recs = json.load(open(f'{x}/records.json'))
+            sp = pd.read_parquet(f'{x}/state/series_state_patch.parquet') if os.path.exists(f'{x}/state/series_state_patch.parquet') else pd.DataFrame()
+            for sid, rec in recs.items():
+                k = zlib.crc32(sid.encode()) % site.NSHARD; self.shard(k)[sid] = rec; self.dirty.add(k)
+                self.rows[sid] = site.meta_row(sid, rec); self.patched.add(sid); self.upd.pop(sid, None)
+            if len(sp):
+                sp = sp.set_index('series_id')
+                for c in self.st.columns:
+                    if c not in sp.columns: sp[c] = None
+                self.st = pd.concat([self.st.drop(index=[i for i in sp.index if i in self.st.index]), sp[self.st.columns]])
+            for f in ('agency_day.parquet', 'corr.parquet', 'side.parquet', 'pop.parquet', 'fnames.json'):
+                if os.path.exists(f'{x}/state/{f}'): shutil.copy(f'{x}/state/{f}', f'{STATE}/{f}'); self.changed_files.add(f'state/{f}')
+            if os.path.isdir(f'{x}/cal'):
+                for c in os.listdir(f'{x}/cal'):
+                    if site.wjson(f'{SITE}/cal/{c}', json.load(open(f'{x}/cal/{c}'))): self.changed_files.add(f'site/data/cal/{c}')
+            if os.path.exists(f'{x}/years.json'):
+                idx = json.load(open(f'{SITE}/index.json')); idx['years'] = json.load(open(f'{x}/years.json')); site.wjson(f'{SITE}/index.json', idx)
+            self.load_maps(); applied.append(p['name']); self.patches_applied.append(p['name']); shutil.rmtree(x, ignore_errors=True)
+            log('patch applied:', p['name'], {k: p.get(k) for k in ('series', 'new', 'history', 'meta')})
+        json.dump(applied, open(af, 'w')); self.changed_files.add('state/applied_patches.json')
+        self.applied_count = len(applied)
+        return [s for s in self.patched if s in self.st.index]
 
     def shard(self, k):
         if k not in self.shards: self.shards[k] = json.load(open(f'{SITE}/d/{k}.json'))
@@ -102,6 +142,7 @@ class Run:
         for k in sorted(self.dirty):
             on_disk = json.load(open(f'{SITE}/d/{k}.json'))
             for sid, rec in on_disk.items():
+                if sid in self.patched: continue          # replaced by a Mac history patch (authorized)
                 new = self.shards[k].get(sid)
                 if new is None: raise RuntimeError(f'series {sid} would leave shard {k}')
                 have = {p[0]: p for p in new['p']}
@@ -111,7 +152,7 @@ class Run:
         self.dirty.clear()
         before = {p: os.path.getmtime(p) for p in self.agg_files()}
         tot = site.aggregates(list(self.rows.values()), self.pop, self.fnames, json.load(open(f'{SITE}/index.json'))['years'], SITE)
-        if tot['series'] < self.before['series'] or tot['prints'] < self.before['prints']:
+        if not self.patched and (tot['series'] < self.before['series'] or tot['prints'] < self.before['prints']):
             raise RuntimeError(f'totals fell: {self.before} -> {tot}')
         for p in self.agg_files():
             if before.get(p) != os.path.getmtime(p): self.changed_files.add(os.path.relpath(p, WORK))
@@ -134,6 +175,8 @@ class Run:
 def main():
     if os.environ.get('NO_RESTORE') != '1': H = store.restore(WORK, DL); log('state restored:', H.get('updated'))
     R = Run(); log('series held', len(R.st), 'site series', R.before)
+    forced = R.apply_patches()
+    if forced: log('series replaced by Mac history patches:', len(forced), '(fetched again from the patch day)')
     up = fred.updates_list(); log('FRED update list:', len(up))
     have = R.st.index
     lu_new = pd.Series(up); lu_new = lu_new[lu_new.index.isin(have)]
@@ -145,18 +188,19 @@ def main():
     todo = list(lu_new[(tso.isna()) | (tsn > tso)].index)
     pend = f'{STATE}/pending.json'
     if os.path.exists(pend): todo = [s for s in json.load(open(pend)) if s in have] + [s for s in todo if s not in set(json.load(open(pend)))]
-    newser = sorted(set(up) - set(have))
+    fs = set(forced); todo = forced + [s for s in todo if s not in fs]
+    newser = sorted(set(up) - set(R.st.index))
     pd.DataFrame({'series_id': newser}).to_csv(f'{STATE}/new_series.csv', index=False)
     log('to update:', len(todo), '| listed by FRED but not held (left to the Mac for now):', len(newser))
     def write_lu(left):                                 # for precheck.py: our FRED stamp of every listed series we hold
         import gzip
-        lu = {s: str(R.get(s, 'fred_lu')) for s in up if s in R.st.index}; lu['_pending'] = left
+        lu = {s: str(R.get(s, 'fred_lu')) for s in up if s in R.st.index}; lu['_pending'] = left; lu['_patches'] = R.applied_count
         f = os.environ.get('LU_FILE', '/tmp/hrtd_lu/lu.json.gz'); os.makedirs(os.path.dirname(f), exist_ok=True)
         with gzip.open(f, 'wt') as fh: json.dump(lu, fh)
     def output(k, v):
         if os.environ.get('GITHUB_OUTPUT'):
             with open(os.environ['GITHUB_OUTPUT'], 'a') as fh: fh.write(f'{k}={v}\n')
-    if not todo:
+    if not todo and not R.patches_applied:
         write_lu(0); output('changed', 'false'); log('nothing new: no save, no deploy'); return
     done = 0; last_save = time.time(); stamp = time.strftime('%Y%m%dT%H%M%SZ', time.gmtime())
     def checkpoint(final):
@@ -190,7 +234,7 @@ def main():
     checkpoint(True)
     kinds = pd.Series([x[2] for x in R.log]).value_counts().to_dict() if R.log else {}
     log('done:', done, 'of', len(todo), kinds)
-    output('changed', 'true' if kinds.get('added', 0) else 'false')
+    output('changed', 'true' if kinds.get('added', 0) or R.patches_applied else 'false')
     if R.log and kinds.get('error', 0) > max(20, 0.05 * done): raise SystemExit('too many fetch errors: see state/last_run_log.csv')
 
 if __name__ == '__main__':

@@ -16,6 +16,9 @@ except Exception as e:
     out(True, f'no lu.json.gz ({type(e).__name__})'); sys.exit(0)
 up = fred.updates_list()
 pend = have.get('_pending', 0)
+pl = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'state', 'patches.json')
+npatch = len(json.load(open(pl))) if os.path.exists(pl) else 0
+if npatch > have.get('_patches', 0): out(True, f'{npatch - have.get("_patches", 0)} history patch(es) from the Mac to apply'); sys.exit(0)
 if pend: out(True, f'{pend} series left from the last run'); sys.exit(0)
 new = [s for s, lu in up.items() if s in have and pd.Timestamp(lu) > pd.Timestamp(have[s])]
 out(bool(new), f'{len(new)} held series with a newer FRED stamp (of {len(up)} listed)')
