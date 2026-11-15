@@ -44,12 +44,14 @@ class Run:
         """history patches from the Mac (tools/export_patch.py), in order, each once: records + states replace ours,
         lookup tables and calendar replace ours; the patched series are then fetched from the patch's L (newer releases re-added)"""
         import shutil, subprocess, tempfile
-        pl = f'{REPO}/state/patches.json'; lst = json.load(open(pl)) if os.path.exists(pl) else []
+        local = os.environ.get('PATCH_LOCAL_DIR')      # tests only: patches.json and the tar files from a local folder
+        pl = f'{local or REPO + "/state"}/patches.json'; lst = json.load(open(pl)) if os.path.exists(pl) else []
         af = f'{STATE}/applied_patches.json'; applied = json.load(open(af)) if os.path.exists(af) else []
         for p in lst:
             if p['name'] in applied: continue
             os.makedirs(DL, exist_ok=True)
-            subprocess.run(['gh', 'release', 'download', store.TAG, '-R', store.REPO, '-p', p['name'], '-D', DL, '--clobber'], check=True)
+            if local: shutil.copy(f'{local}/{p["name"]}', f'{DL}/{p["name"]}')
+            else: subprocess.run(['gh', 'release', 'download', store.TAG, '-R', store.REPO, '-p', p['name'], '-D', DL, '--clobber'], check=True)
             got = store.sha(f'{DL}/{p["name"]}')
             if got != p['sha256']: raise RuntimeError(f'{p["name"]}: SHA-256 {got} is not {p["sha256"]}')
             x = tempfile.mkdtemp(prefix='patch_'); subprocess.run(['tar', '--zstd', '-xf', f'{DL}/{p["name"]}', '-C', x], check=True)
