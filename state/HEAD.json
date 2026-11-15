@@ -1,0 +1,16 @@
+{
+ "assets": [
+  [
+   "base-20261115T144524Z.tar.zst.part00",
+   "8887b11330788bfe7b575e03037d645e3b0ccf58a6915945c93b04cdca0995d0"
+  ]
+ ],
+ "order": [
+  [
+   "base-20261115T144524Z.tar.zst.part00"
+  ]
+ ],
+ "updated": "20261115T144524Z",
+ "base": "20261115T144524Z",
+ "previous": []
+}
