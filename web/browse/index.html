@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Browse — HRTD</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&amp;family=Source+Serif+4:wght@600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/hrtd.css">
+<script src="/assets/hrtd.js"></script>
+</head>
+<body>
+<div id="hdr"></div>
+<main class="wrap" id="main"><div class="loading">Loading…</div></main>
+<div id="ftr"></div>
+<script>
+const KIND = { f: 'Function', a: 'Source', r: 'Release', q: 'Frequency' };
+const tableOf = (list, k, extra) => `<div class="tbl"><table><thead><tr><th>${KIND[k]}</th>${extra ? '<th>Agency</th>' : ''}<th class="num">Series</th><th class="num">First prints</th></tr></thead><tbody>${list.map(e => `<tr data-n="${H.esc(e.name.toLowerCase())}"><td><a href="${H.browseUrl(k, e.slug)}">${H.esc(e.name)}</a></td>${extra ? `<td class="small">${H.esc(e.agency)}</td>` : ''}<td class="num">${H.int(e.n)}</td><td class="num">${H.int(e.prints)}</td></tr>`).join('')}</tbody></table></div>`;
+const FORDER = ['Daily', 'Weekly', 'Biweekly', 'Monthly', 'Quarterly', 'Semiannual', 'Annual', 'Other'];
+const freqHtml = (list) => {
+  const g = {};
+  list.forEach(e => {
+    const base = e.name.split(',')[0].trim();
+    const key = FORDER.includes(base) ? base : 'Other';
+    let label = e.name.includes(',') ? e.name.split(',').slice(1).join(',').trim() : (key === 'Other' ? e.name : 'Standard');
+    if (/^true$/i.test(label)) label = 'Unspecified';
+    (g[key] = g[key] || []).push(Object.assign({ label }, e));
+  });
+  return `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px">${FORDER.filter(k => g[k]).map(k => {
+    const items = g[k].sort((a, b) => b.n - a.n), n = items.reduce((t, e) => t + e.n, 0), pr = items.reduce((t, e) => t + e.prints, 0);
+    return `<section style="border:1px solid var(--line)"><div style="background:var(--tint);padding:12px 14px;display:flex;justify-content:space-between;align-items:baseline;gap:8px"><b style="font-size:18px;color:var(--navy)">${k}</b><span class="small muted">${H.int(n)} series · ${H.int(pr)} first prints</span></div>
+<table><tbody>${items.map(e => `<tr><td><a href="${H.browseUrl('q', e.slug)}">${H.esc(e.label)}</a></td><td class="num">${H.int(e.n)}</td><td class="num n small">${H.int(e.prints)}</td></tr>`).join('')}</tbody></table></section>`;
+  }).join('')}</div><p class="small muted">Columns: variant · series · first prints. “Standard” is the plain frequency; other variants are the agency's timing labels.</p>`;
+};
+const filt = (inp, tbl) => { inp.oninput = () => { const v = inp.value.toLowerCase(); tbl.querySelectorAll('tbody tr').forEach(tr => { tr.style.display = tr.dataset.n.includes(v) ? '' : 'none'; }); }; };
+(async () => {
+  const main = document.getElementById('main'), idx = await H.idx(), t = idx.totals;
+  const k = H.qs('k'), s = H.qs('s'), g = H.qs('g'), p = parseInt(H.qs('p') || '0', 10) || 0;
+  if (g) {
+    const grp = H.GROUPS.find(x => x.key === g);
+    if (!grp) { main.innerHTML = '<p>Unknown source group. <a href="/browse/">Browse all</a>.</p>'; return; }
+    const gi = H.groupInfo(idx, grp);
+    document.title = grp.label + ' — HRTD';
+    main.innerHTML = `<div class="crumbs"><a href="/browse/">Browse</a> › Sources</div><h1 class="pg">${H.esc(grp.label)}</h1><p class="muted">${H.int(gi.n)} series from ${gi.mem.length} sources</p>${tableOf(gi.mem, 'a')}`;
+    return;
+  }
+  if (!k) {
+    document.title = 'Browse — HRTD';
+    main.innerHTML = `<h1 class="pg">Browse the database</h1>
+<p class="muted">${H.int(t.series)} series · ${H.int(t.prints)} first prints · ${t.functions} functions · ${t.agencies} sources · ${t.releases} releases</p>
+<h2 style="margin-top:24px">Functions</h2>${tableOf(idx.functions, 'f')}
+<h2 id="sources" style="margin-top:32px">Sources</h2><input class="filter" id="fa" placeholder="Filter sources" aria-label="Filter sources"><div style="height:10px"></div><div id="ta">${tableOf(idx.agencies, 'a')}</div>
+<h2 id="releases" style="margin-top:32px">Releases</h2><input class="filter" id="fr" placeholder="Filter releases" aria-label="Filter releases"><div style="height:10px"></div><div id="tr">${tableOf(idx.releases, 'r', true)}</div>
+<h2 id="frequencies" style="margin-top:32px">Frequencies</h2>${freqHtml(idx.frequencies)}`;
+    filt(document.getElementById('fa'), document.getElementById('ta'));
+    filt(document.getElementById('fr'), document.getElementById('tr'));
+    if (location.hash) { const el = document.querySelector(location.hash); if (el) el.scrollIntoView(); }
+    return;
+  }
+  if (!KIND[k] || !s) { main.innerHTML = '<p>Unknown page. <a href="/browse/">Browse all</a>.</p>'; return; }
+  let pg;
+  try { pg = await H.get(`/data/b/${k}/${encodeURIComponent(s)}/${p}.json`); } catch (e) { main.innerHTML = '<p>That page does not exist. <a href="/browse/">Browse all</a>.</p>'; return; }
+  const p0 = p === 0 ? pg : await H.get(`/data/b/${k}/${encodeURIComponent(s)}/0.json`);
+  document.title = `${pg.name} — HRTD`;
+  let bd = '';
+  const B = p0.breakdown || [];
+  if (k === 'f') bd = B.slice(0, 60).map(([[a, r], n]) => { const re = H.find(idx.releases, r); return `<tr><td>${re ? `<a href="${H.browseUrl('r', re.slug)}">${H.esc(r)}</a>` : H.esc(r)}</td><td class="small">${H.esc(a)}</td><td class="num">${H.int(n)}</td></tr>`; }).join('');
+  if (k === 'a') bd = B.slice(0, 60).map(([r, n]) => { const re = H.find(idx.releases, r); return `<tr><td>${re ? `<a href="${H.browseUrl('r', re.slug)}">${H.esc(r)}</a>` : H.esc(r)}</td><td class="num">${H.int(n)}</td></tr>`; }).join('');
+  if (k === 'r' || k === 'q') bd = B.map(([f, n]) => { const fe = idx.functions.find(x => x.slug === f); return `<tr><td>${fe ? `<a href="${H.browseUrl('f', fe.slug)}">${H.esc(fe.name)}</a>` : H.esc(f)}</td><td class="num">${H.int(n)}</td></tr>`; }).join('');
+  const bdHead = k === 'f' ? '<th>Release</th><th>Agency</th>' : k === 'a' ? '<th>Release</th>' : '<th>Function</th>';
+  const nav = (i, l) => `<a class="btn sec" style="display:inline-flex;align-items:center;text-decoration:none" href="${H.browseUrl(k, s, i)}">${l}</a>`;
+  const pager = pg.pages > 1 ? `${p > 0 ? nav(p - 1, '← Previous') : ''}<span class="muted">Page ${p + 1} of ${H.int(pg.pages)} · series ranked headline-first</span>${p < pg.pages - 1 ? nav(p + 1, 'Next →') : ''}` : '';
+  main.innerHTML = `<div class="crumbs"><a href="/browse/">Browse</a> › ${KIND[k]}</div>
+<h1 class="pg">${H.esc(pg.name)}</h1><p class="muted">${H.int(pg.total)} series</p>
+<div class="cols"><section class="main"><h2>Series</h2><input class="filter" id="fs" placeholder="Filter this page" aria-label="Filter series on this page"><div class="pager">${pager}</div>
+<div id="rows">${pg.rows.map(r => H.rowHtml(r).replace('<div class="hit">', `<div class="hit" data-n="${H.esc((r[0] + ' ' + r[1]).toLowerCase())}">`)).join('')}</div><div class="pager">${pager}</div></section>
+<aside class="side"><h2>Breakdown</h2><div class="tbl"><table><thead><tr>${bdHead}<th class="num">Series</th></tr></thead><tbody>${bd}</tbody></table></div>${B.length > 60 ? `<p class="small muted">Top 60 of ${B.length} shown.</p>` : ''}</aside></div>`;
+  const fs = document.getElementById('fs');
+  fs.oninput = () => { const v = fs.value.toLowerCase(); document.querySelectorAll('#rows .hit').forEach(d => { d.style.display = d.dataset.n.includes(v) ? '' : 'none'; }); };
+})().catch(e => { console.error(e); document.getElementById('main').innerHTML = '<p>This page failed to load. Please reload.</p>'; });
+</script>
+</body>
+</html>

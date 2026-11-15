@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Search — HRTD</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&amp;family=Source+Serif+4:wght@600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/hrtd.css">
+<script src="/assets/hrtd.js"></script>
+</head>
+<body>
+<div id="hdr"></div>
+<main class="wrap">
+  <h1 class="pg" id="h">Search</h1>
+  <div id="facets"></div>
+  <div class="pager" id="pg1"></div>
+  <div id="res"><div class="loading">Searching…</div></div>
+  <div class="pager" id="pg2"></div>
+</main>
+<div id="ftr"></div>
+<script>
+(async () => {
+  const q = (H.qs('q') || '').trim(), p = Math.max(0, parseInt(H.qs('p') || '0', 10) || 0), PER = 50;
+  document.title = (q ? q + ' — ' : '') + 'Search — HRTD';
+  const res = document.getElementById('res');
+  if (!q) { document.getElementById('h').textContent = 'Search'; res.innerHTML = '<p>Type a keyword or series ID in the search box.</p>'; return; }
+  const idx = await H.idx();
+  const ql = q.toLowerCase();
+  const fac = [];
+  idx.functions.filter(e => e.name.toLowerCase().includes(ql)).forEach(e => fac.push(`<a class="tag" href="${H.browseUrl('f', e.slug)}">Function: ${H.esc(e.name)} (${H.int(e.n)})</a>`));
+  idx.agencies.filter(e => e.name.toLowerCase().includes(ql)).slice(0, 10).forEach(e => fac.push(`<a class="tag" href="${H.browseUrl('a', e.slug)}">Source: ${H.esc(e.name)} (${H.int(e.n)})</a>`));
+  idx.releases.filter(e => e.name.toLowerCase().includes(ql)).slice(0, 10).forEach(e => fac.push(`<a class="tag" href="${H.browseUrl('r', e.slug)}">Release: ${H.esc(e.name)} (${H.int(e.n)})</a>`));
+  document.getElementById('facets').innerHTML = fac.length ? `<div style="margin-bottom:12px">${fac.join('')}</div>` : '';
+  const ranks = await H.search(q);
+  document.getElementById('h').innerHTML = `${H.int(ranks.length)} series match “${H.esc(q)}”`;
+  if (!ranks.length) { res.innerHTML = '<p>No series match every word. Try fewer or different words, or <a href="/browse/">browse the database</a>.</p>'; return; }
+  const pages = Math.ceil(ranks.length / PER), cur = Math.min(p, pages - 1);
+  const rows = await H.metaRows(ranks.slice(cur * PER, (cur + 1) * PER));
+  res.innerHTML = rows.map(H.rowHtml).join('');
+  const link = (i, l) => `<a class="btn sec" style="display:inline-flex;align-items:center;text-decoration:none" href="/search/?q=${encodeURIComponent(q)}&p=${i}">${l}</a>`;
+  const pg = pages > 1 ? `${cur > 0 ? link(cur - 1, '← Previous') : ''}<span class="muted">Page ${cur + 1} of ${H.int(pages)}</span>${cur < pages - 1 ? link(cur + 1, 'Next →') : ''}` : '';
+  document.getElementById('pg1').innerHTML = pg; document.getElementById('pg2').innerHTML = pg;
+})().catch(e => { console.error(e); document.getElementById('res').innerHTML = '<p>Search failed to load. Please reload the page.</p>'; });
+</script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HRTD — Hall Realtime Database</title>
+<meta name="description" content="HRTD, the Hall Realtime Database: U.S. economic data exactly as it was first released, with documented release days.">
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&amp;family=Source+Serif+4:wght@600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/hrtd.css">
+<script src="/assets/hrtd.js"></script>
+</head>
+<body>
+<div id="hdr" data-nosearch="1"></div>
+<section class="hero"><div class="in">
+  <h1>Find U.S. economic data as it was first released</h1>
+  <p id="tot">675,896 series · 32,093,236 first prints · release days from dated records, never estimated</p>
+  <form class="bigsearch" action="/search/" method="get" role="search">
+    <label for="q2" class="sr">Search series</label>
+    <input id="q2" name="q" placeholder="Search by keyword or series ID (e.g. payrolls, CPIAUCSL)">
+    <button>Search</button>
+  </form>
+  <div class="popular"><span class="muted">Popular:</span><a href="/series/?id=UNRATE">Unemployment Rate</a><a href="/series/?id=PAYEMS">Nonfarm Payrolls</a><a href="/series/?id=CPIAUCSL">CPI</a><a href="/series/?id=GDPC1">Real GDP</a><a href="/series/?id=ICSA">Initial Claims</a><a href="/series/?id=HOUST">Housing Starts</a></div>
+</div></section>
+<main class="wrap"><div class="cols">
+  <section class="main">
+    <h2>Browse by Function</h2>
+    <div class="grid" id="fns"><span class="loading">Loading…</span></div>
+    <h2 style="margin-top:36px">Browse by Source</h2>
+    <div class="grid" id="srcs"><span class="loading">Loading…</span></div>
+  </section>
+  <aside class="side">
+    <h2>Latest Data</h2>
+    <div id="latest"><span class="loading">Loading…</span></div>
+    <div class="note" style="margin-top:10px"><strong>What is real-time data?</strong> The value an agency published for a period the first time, before any revision — with the day it became public. <a href="/methodology/">Methodology</a></div>
+  </aside>
+</div></main>
+<div id="ftr"></div>
+<script>
+(async () => {
+  const idx = await H.idx();
+  const t = idx.totals;
+  document.getElementById('tot').textContent = `${H.int(t.series)} series · ${H.int(t.prints)} first prints · release days from dated records, never estimated`;
+  document.getElementById('fns').innerHTML = idx.functions.map(f => `<a href="${H.browseUrl('f', f.slug)}">${H.esc(f.name)} <span class="n">(${H.int(f.n)})</span></a>`).join('');
+  document.getElementById('srcs').innerHTML = H.GROUPS.map(g => { const gi = H.groupInfo(idx, g); return gi.n ? `<a href="${gi.url}">${H.esc(g.label)} <span class="n">(${H.int(gi.n)})</span></a>` : ''; }).join('')
+    + `<a href="/browse/#sources">All ${t.agencies} sources →</a>`;
+  const lt = await H.get('/data/latest.json');
+  document.getElementById('latest').innerHTML = ['UNRATE', 'PAYEMS', 'ICSA', 'GDPC1', 'CPIAUCSL', 'FEDFUNDS'].filter(id => lt[id]).map(id => {
+    const s = lt[id], last = s.pts[s.pts.length - 1];
+    return `<div class="card"><div class="t"><a href="${H.seriesUrl(id)}" style="font-weight:600">${H.esc(s.t)}</a>
+<div>${H.period(last[0], s.q)}: ${H.val(last[1])}${last[2] ? ' · released ' + H.date(last[2]) : ''}</div><div>${H.esc(s.u)}</div></div>
+<svg viewBox="0 0 120 32" aria-hidden="true"><path d="${H.spark(s.pts.map(p => p[1]))}"/></svg></div>`;
+  }).join('');
+})().catch(e => { console.error(e); });
+</script>
+</body>
+</html>

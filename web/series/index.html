@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Series — HRTD</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&amp;family=Source+Serif+4:wght@600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/hrtd.css">
+<script src="/assets/hrtd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+.ctl{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin:16px 0 10px}
+.ranges{display:inline-flex;border:1px solid var(--line)}
+.ranges button{background:#FFFFFF;border:0;border-right:1px solid var(--line);padding:0 14px;min-height:40px;font:inherit;font-weight:600;color:var(--link);cursor:pointer}
+.ranges button:last-child{border-right:0}.ranges button.on{background:var(--link);color:#FFFFFF}
+.dates{display:flex;align-items:center;gap:8px;font-size:15px}.dates input{font:inherit;border:1px solid #9FB0C4;padding:7px 8px;min-height:40px}
+.zoom{display:inline-flex;gap:6px;margin-left:auto}
+.zoom button{min-width:40px;min-height:40px;border:1px solid var(--line);background:#FFFFFF;color:var(--link);font:inherit;font-size:20px;font-weight:600;cursor:pointer}
+.zoom button#zr{font-size:14px;padding:0 12px}
+.chartbox canvas{touch-action:none;cursor:grab}.chartbox canvas.drag{cursor:grabbing}
+.hint{font-size:13px;color:var(--mute);margin-top:6px}
+</style>
+</head>
+<body>
+<div id="hdr"></div>
+<main class="wrap" id="main"><div class="loading">Loading series…</div></main>
+<div id="ftr"></div>
+<script>
+(async () => {
+  const id = (H.qs('id') || '').trim(), main = document.getElementById('main');
+  if (!id) { main.innerHTML = '<p>No series given. <a href="/browse/">Browse the database</a>.</p>'; return; }
+  const idx = await H.idx();
+  const shard = await H.get(`/data/d/${H.crc32(id) % idx.totals.nshard}.json`);
+  const s = shard[id];
+  if (!s) { main.innerHTML = `<h1 class="pg">Series not found</h1><p>No series with ID “${H.esc(id)}”. <a href="/search/?q=${encodeURIComponent(id)}">Search for it</a>.</p>`; return; }
+  document.title = `${s.t} (${id}) — HRTD`;
+  const P = s.p, last = P[P.length - 1], fno = s.fn.slice(0, 2);
+  const fe = idx.functions.find(f => f.slug === fno), ae = H.find(idx.agencies, s.a), re = H.find(idx.releases, s.r);
+  const withDay = P.filter(p => p[2]).length;
+  const unitsOn = (rel) => { if (!s.uh || !rel) return ''; let u = ''; for (const x of s.uh) if (x[0] <= rel) u = x[1]; return u; };
+  main.innerHTML = `
+<div class="crumbs"><a href="/browse/">Browse</a> › ${fe ? `<a href="${H.browseUrl('f', fe.slug)}">${H.esc(fe.name)}</a> › ` : ''}${ae ? `<a href="${H.browseUrl('a', ae.slug)}">${H.esc(s.a)}</a> › ` : H.esc(s.a) + ' › '}${re ? `<a href="${H.browseUrl('r', re.slug)}">${H.esc(s.r)}</a>` : H.esc(s.r)}</div>
+<h1 class="pg">${H.esc(s.t)}</h1>
+<div class="muted">${H.esc(id)} · ${H.esc(s.q)} · ${H.esc(s.u)}${s.sa ? ' · ' + H.esc(s.sa) : ''}${s.src ? ' · Source: ' + H.esc(s.src) : ''}</div>
+<div class="facts">
+ <div><b>${H.val(last[1])}</b><span>Latest first print · ${H.period(last[0], s.q)}</span></div>
+ <div><b>${last[2] ? H.date(last[2]) : '—'}</b><span>Released</span></div>
+ <div><b>${H.int(P.length)}</b><span>First prints</span></div>
+ <div><b>${H.period(P[0][0], s.q)}</b><span>Earliest period</span></div>
+ <div><b>${H.int(withDay)}</b><span>With a documented release day</span></div>
+</div>
+<div class="ctl">
+ <div class="ranges" role="group" aria-label="Range"><button data-y="1">1Y</button><button data-y="5">5Y</button><button data-y="10">10Y</button><button data-y="25">25Y</button><button data-y="max" class="on">Max</button></div>
+ <div class="dates"><input id="d0" type="date" aria-label="From"> to <input id="d1" type="date" aria-label="To"></div>
+ <button class="btn sec" id="dl">Download CSV</button>
+ <div class="zoom"><button id="zi" title="Zoom in" aria-label="Zoom in">+</button><button id="zo" title="Zoom out" aria-label="Zoom out">−</button><button id="zr" hidden>Reset zoom</button></div>
+</div>
+<div class="chartbox"><canvas id="ch" role="img" aria-label="Chart of first prints for ${H.esc(id)}"></canvas></div>
+<div class="hint">Scroll over the chart to zoom, drag to move through time.</div>
+<p class="small muted">Each point is the value first published for that period. Values are shown exactly as published; changes of base year, units or definition by the agency appear as level shifts${s.uh ? ' (see Units over time below)' : ''}. Release days come from dated records and are never estimated — ${H.int(P.length - withDay)} first prints have no release day found yet.</p>
+${s.uh ? `<h2 style="margin-top:28px">Units over time</h2><p class="small muted">The agency changed this series' units or base year. Each first print is in the units in force on its release day (ALFRED metadata history).</p><div class="tbl"><table><thead><tr><th>In force from</th><th>Units</th></tr></thead><tbody>${s.uh.slice().reverse().map(u => `<tr><td>${H.date(u[0]) || H.esc(u[0])}</td><td>${H.esc(u[1])}</td></tr>`).join('')}</tbody></table></div>` : ''}
+<h2 style="margin-top:28px">First prints</h2>
+<div class="tbl"><table><thead><tr><th>Period</th><th class="num">Value</th><th>Release day</th>${s.uh ? '<th>Units on release day</th>' : ''}</tr></thead><tbody id="tb"></tbody></table></div>
+<div class="pager"><button class="btn sec" id="more">Show all ${H.int(P.length)} rows</button></div>`;
+
+  // table
+  const tb = document.getElementById('tb');
+  const fill = (n) => { tb.innerHTML = P.slice().reverse().slice(0, n).map(p => `<tr><td>${H.period(p[0], s.q)} <span class="n small">${H.esc(p[0])}</span></td><td class="num">${H.val(p[1])}</td><td>${p[2] ? H.date(p[2]) : '<span class="n">not yet found</span>'}</td>${s.uh ? `<td class="small">${H.esc(unitsOn(p[2]))}</td>` : ''}</tr>`).join(''); };
+  fill(120);
+  const mb = document.getElementById('more'); if (P.length <= 120) mb.remove(); else mb.onclick = () => { fill(P.length); mb.remove(); };
+  document.getElementById('dl').onclick = () => {
+    const csv = 'series_id,period,value,release_date\n' + P.map(p => `${id},${p[0]},${p[1]},${p[2]}`).join('\n') + '\n';
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a.download = `${id}_first_prints.csv`; a.click();
+  };
+
+  // chart data
+  const ts = (d) => Date.UTC(+d.slice(0, 4), +(d.slice(5, 7) || 1) - 1, +(d.slice(8, 10) || 1));
+  const ALL = P.map(p => ({ x: ts(p[0]), y: parseFloat(p[1]), per: p[0], rel: p[2], raw: p[1] })).filter(o => !isNaN(o.y));
+  if (ALL.length < 1) return;
+  const firstT = ALL[0].x, lastT = ALL[ALL.length - 1].x;
+  const gaps = ALL.slice(1).map((o, i) => o.x - ALL[i].x).sort((a, b) => a - b);
+  const step = gaps.length ? gaps[Math.floor(gaps.length / 2)] : 86400000 * 30;
+  const MINSPAN = Math.max(step * 6, 86400000 * 14);
+  const FULL = Math.max(lastT - firstT, MINSPAN);
+  const iso = (t) => new Date(t).toISOString().slice(0, 10);
+  const d0 = document.getElementById('d0'), d1 = document.getElementById('d1');
+  d0.min = d1.min = iso(firstT); d0.max = d1.max = iso(lastT);
+  let cur = { t0: firstT, t1: firstT + FULL };
+  const visible = () => {
+    let a = 0, b = ALL.length - 1;
+    while (a < ALL.length && ALL[a].x < cur.t0) a++;
+    while (b >= 0 && ALL[b].x > cur.t1) b--;
+    return ALL.slice(Math.max(0, a - 1), Math.min(ALL.length, b + 2));
+  };
+  const fmtTick = (v) => { const d = new Date(v), span = cur.t1 - cur.t0; return span < 86400000 * 400 ? `${MON[d.getUTCMonth()]} ${d.getUTCFullYear()}` : String(d.getUTCFullYear()); };
+  const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const canvas = document.getElementById('ch');
+  const chart = new Chart(canvas, {
+    type: 'line',
+    data: { datasets: [{ data: [], borderColor: '#0B3C8C', borderWidth: 1.5, pointRadius: 0, pointHoverRadius: 4, tension: 0 }] },
+    options: {
+      parsing: false, animation: false, maintainAspectRatio: false, normalized: true,
+      interaction: { mode: 'nearest', axis: 'x', intersect: false },
+      plugins: { legend: { display: false }, decimation: { enabled: true, algorithm: 'lttb', samples: 1500, threshold: 2500 },
+        tooltip: { callbacks: { title: (it) => H.period(it[0].raw.per, s.q), label: (it) => `${H.val(it.raw.raw)}${unitsOn(it.raw.rel) ? ' ' + unitsOn(it.raw.rel) : ''}${it.raw.rel ? ' · released ' + H.date(it.raw.rel) : ' · release day not yet found'}` } } },
+      scales: { x: { type: 'linear', ticks: { maxTicksLimit: 10, callback: fmtTick }, grid: { color: '#EEF1F5' } },
+        y: { ticks: { callback: (v) => Number(v).toLocaleString('en-US') }, grid: { color: '#EEF1F5' } } }
+    }
+  });
+  const draw = () => {
+    const v = visible();
+    chart.data.datasets[0].data = v;
+    chart.data.datasets[0].pointRadius = v.length < 90 ? 2 : 0;
+    chart.options.scales.x.min = cur.t0; chart.options.scales.x.max = cur.t1;
+    chart.update('none');
+    d0.value = iso(Math.max(cur.t0, firstT)); d1.value = iso(Math.min(cur.t1, lastT));
+    document.getElementById('zr').hidden = cur.t0 <= firstT && cur.t1 >= firstT + FULL;
+  };
+  const setWindow = (t0, t1, keepRange) => {
+    let span = t1 - t0;
+    if (span < MINSPAN) { const c = (t0 + t1) / 2; t0 = c - MINSPAN / 2; t1 = c + MINSPAN / 2; span = MINSPAN; }
+    if (span >= FULL) { t0 = firstT; t1 = firstT + FULL; }
+    else { if (t0 < firstT) { t0 = firstT; t1 = t0 + span; } if (t1 > firstT + FULL) { t1 = firstT + FULL; t0 = t1 - span; } }
+    cur = { t0, t1 };
+    if (!keepRange) document.querySelectorAll('.ranges button').forEach(b => b.classList.remove('on'));
+    draw();
+  };
+  const zoomAt = (f, tAt) => { if (tAt === undefined) tAt = (cur.t0 + cur.t1) / 2; setWindow(tAt - (tAt - cur.t0) * f, tAt + (cur.t1 - tAt) * f); };
+  document.querySelectorAll('.ranges button').forEach(b => b.onclick = () => {
+    document.querySelectorAll('.ranges button').forEach(x => x.classList.toggle('on', x === b));
+    const y = b.dataset.y;
+    if (y === 'max') setWindow(firstT, firstT + FULL, true);
+    else setWindow(lastT - y * 365.25 * 86400000, lastT, true);
+  });
+  document.getElementById('zi').onclick = () => zoomAt(0.6);
+  document.getElementById('zo').onclick = () => zoomAt(1 / 0.6);
+  document.getElementById('zr').onclick = () => { document.querySelector('.ranges button[data-y="max"]').click(); };
+  const onDate = () => { const a = Date.parse(d0.value), b = Date.parse(d1.value); if (!isNaN(a) && !isNaN(b) && b > a) setWindow(a, b); };
+  d0.onchange = onDate; d1.onchange = onDate;
+  canvas.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const tAt = chart.scales.x.getValueForPixel(e.offsetX);
+    const k = Math.max(-0.25, Math.min(0.25, e.deltaY / 600));
+    zoomAt(1 + k, tAt);
+  }, { passive: false });
+  let drag = null;
+  canvas.addEventListener('pointerdown', (e) => { drag = { x: e.clientX, t0: cur.t0, t1: cur.t1 }; canvas.setPointerCapture(e.pointerId); canvas.classList.add('drag'); });
+  canvas.addEventListener('pointermove', (e) => {
+    if (!drag) return;
+    const area = chart.chartArea, dt = (e.clientX - drag.x) / (area.right - area.left) * (drag.t1 - drag.t0);
+    setWindow(drag.t0 - dt, drag.t1 - dt);
+  });
+  const end = () => { drag = null; canvas.classList.remove('drag'); };
+  canvas.addEventListener('pointerup', end); canvas.addEventListener('pointercancel', end);
+  draw();
+})().catch(e => { console.error(e); document.getElementById('main').innerHTML = '<p>This series failed to load. Please reload the page.</p>'; });
+</script>
+</body>
+</html>

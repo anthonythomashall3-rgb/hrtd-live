@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>About HRTD — HRTD</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&amp;family=Source+Serif+4:wght@600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/hrtd.css">
+<script src="/assets/hrtd.js"></script>
+</head>
+<body>
+<div id="hdr"></div>
+<main class="wrap" style="max-width:860px;line-height:1.6">
+<h1 class="pg">About HRTD</h1>
+<p>HRTD, the Hall Realtime Database, is the real-time economic dataset of the Bristow-Hall Program at the University of Southern California.</p>
+<p>It records U.S. economic data exactly as it was known on the day it was released, so that research on recessions and the business cycle can be tested on the information that was actually available at the time.</p>
+<p id="stats"></p>
+<p>The website is rebuilt from the database automatically whenever the database is updated.</p>
+<script>H.idx().then(i=>{const t=i.totals;document.getElementById('stats').textContent=`It currently holds ${H.int(t.series)} series and ${H.int(t.prints)} first prints from ${t.agencies} sources and ${t.releases} releases, reaching back to ${t.earliest.slice(0,4)}.`});</script>
+</main>
+<div id="ftr"></div>
+</body>
+</html>
