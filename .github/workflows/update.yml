@@ -20,7 +20,7 @@ env:
   DEPLOY_BRANCH: github
   WORK: /mnt/hrtd/work
   LU_FILE: /mnt/hrtd/lu/lu.json.gz
-  FRED_PER_MIN: '60'
+  FRED_PER_MIN: '110'
 jobs:
   update:
     runs-on: ubuntu-24.04
