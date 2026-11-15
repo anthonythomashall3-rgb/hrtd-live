@@ -148,21 +148,30 @@ def main():
     newser = sorted(set(up) - set(have))
     pd.DataFrame({'series_id': newser}).to_csv(f'{STATE}/new_series.csv', index=False)
     log('to update:', len(todo), '| listed by FRED but not held (left to the Mac for now):', len(newser))
+    def write_lu(left):                                 # for precheck.py: our FRED stamp of every listed series we hold
+        import gzip
+        lu = {s: str(R.get(s, 'fred_lu')) for s in up if s in R.st.index}; lu['_pending'] = left
+        f = os.environ.get('LU_FILE', '/tmp/hrtd_lu/lu.json.gz'); os.makedirs(os.path.dirname(f), exist_ok=True)
+        with gzip.open(f, 'wt') as fh: json.dump(lu, fh)
+    def output(k, v):
+        if os.environ.get('GITHUB_OUTPUT'):
+            with open(os.environ['GITHUB_OUTPUT'], 'a') as fh: fh.write(f'{k}={v}\n')
+    if not todo:
+        write_lu(0); output('changed', 'false'); log('nothing new: no save, no deploy'); return
     done = 0; last_save = time.time(); stamp = time.strftime('%Y%m%dT%H%M%SZ', time.gmtime())
     def checkpoint(final):
         nonlocal last_save
         tot = R.check_and_write(); left = todo[done:]
         json.dump(left, open(pend, 'w')); R.changed_files.add('state/pending.json'); R.save_state()
         pd.DataFrame(R.log, columns=['at', 'series_id', 'result', 'note']).to_csv(f'{STATE}/last_run_log.csv', index=False); R.changed_files.add('state/last_run_log.csv')
-        if final:                                           # for precheck.py: our FRED stamp of every listed series we hold
-            import gzip
-            lu = {s: str(R.get(s, 'fred_lu')) for s in up if s in R.st.index}; lu['_pending'] = len(left)
-            os.makedirs(os.path.dirname(os.environ.get('LU_FILE', '/tmp/hrtd_lu/lu.json.gz')), exist_ok=True)
-            with gzip.open(os.environ.get('LU_FILE', '/tmp/hrtd_lu/lu.json.gz'), 'wt') as f: json.dump(lu, f)
+        if final: write_lu(len(left))
         log('checked:', tot, '| files changed:', len(R.changed_files), '| left:', len(left))
         if not DRY:
             name, size = store.save_delta(WORK, sorted(R.changed_files), time.strftime('%Y%m%dT%H%M%SZ', time.gmtime()), DL)
             store.commit(f'state: {done} series checked, {len(left)} left ({name}, {size >> 20} MB)'); log('saved', name)
+            if len(store.head()['order']) > 8:           # keep restores fast: one new base, then the old files go
+                parts = store.save_base(WORK, time.strftime('%Y%m%dT%H%M%SZ', time.gmtime()), DL)
+                store.commit(f'state: new base {parts}'); store.prune(); log('new base', parts)
             R.changed_files.clear()
         last_save = time.time()
     with ThreadPoolExecutor(int(os.environ.get('FETCH_THREADS', '4'))) as ex:
@@ -181,6 +190,7 @@ def main():
     checkpoint(True)
     kinds = pd.Series([x[2] for x in R.log]).value_counts().to_dict() if R.log else {}
     log('done:', done, 'of', len(todo), kinds)
+    output('changed', 'true' if kinds.get('added', 0) else 'false')
     if R.log and kinds.get('error', 0) > max(20, 0.05 * done): raise SystemExit('too many fetch errors: see state/last_run_log.csv')
 
 if __name__ == '__main__':

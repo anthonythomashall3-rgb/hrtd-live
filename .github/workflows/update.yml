@@ -47,6 +47,7 @@ jobs:
         run: |
           if [ "${{ inputs.force }}" = "true" ]; then echo "run=true" >> "$GITHUB_OUTPUT"; else python -m hrtd.precheck; fi
       - name: add what is new
+        id: upd
         if: steps.pre.outputs.run == 'true'
         env:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
@@ -60,7 +61,7 @@ jobs:
           path: /mnt/hrtd/lu
           key: hrtd-lu-${{ github.run_id }}
       - name: deploy the site
-        if: steps.pre.outputs.run == 'true' && success()
+        if: steps.upd.outputs.changed == 'true' && success()
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -70,7 +71,7 @@ jobs:
           n=$(find "$D" -type f | wc -l); echo "files: $n"; [ "$n" -lt 19800 ] || { echo "over the Pages limit of 20,000 files"; exit 1; }
           npx --yes wrangler@4 pages deploy "$D" --project-name hrtd --branch "$DEPLOY_BRANCH" --commit-dirty=true
       - name: side by side with the Mac's site
-        if: steps.pre.outputs.run == 'true' && success() && env.DEPLOY_BRANCH == 'github'
+        if: steps.upd.outputs.changed == 'true' && success() && env.DEPLOY_BRANCH == 'github'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
