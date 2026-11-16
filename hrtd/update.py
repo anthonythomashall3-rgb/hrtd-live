@@ -99,7 +99,12 @@ class Run:
 
     def apply(self, res, lu):
         sid = res['sid']
-        if res['kind'] != 'fetched': self.log.append((now(), sid, res['kind'], res['why'])); return
+        if res['kind'] != 'fetched':
+            self.log.append((now(), sid, res['kind'], res['why']))
+            # 1116: a series FRED rewrote (or one in a state we do not update) is not asked again until FRED stamps it anew
+            # (it was re-asked on every run); a fetch error is still retried
+            if res['kind'] in ('problem', 'skip'): self.upd.setdefault(sid, {}).update(fred_lu=lu)
+            return
         rows, L = res['rows'], res['L']
         after = [r for r in rows if r[1] > L]
         newL = max([r[1] for r in rows] + [L])
@@ -179,7 +184,15 @@ def main():
     R = Run(); log('series held', len(R.st), 'site series', R.before)
     forced = R.apply_patches()
     if forced: log('series replaced by Mac history patches:', len(forced), '(fetched again from the patch day)')
-    up = fred.updates_list(); log('FRED update list:', len(up))
+    # 1116: inside the watch loop the check (precheck.py) has already read FRED's newest updates: use them, not the whole
+    # two-week list (119 requests, over a minute). The whole list is read on the first pass of a job, after a patch, and
+    # whenever series are left over.
+    ff = os.environ.get('FRESH_FILE'); fresh_mode = False; top = None
+    if ff and os.path.exists(ff) and os.environ.get('NO_RESTORE') == '1' and not forced:
+        fj = json.load(open(ff)); os.remove(ff); up = fj['ids']; top = fj['_top']; fresh_mode = True; log('new on FRED (from the check):', len(up))
+    else:
+        t = fred.api('series/updates', filter_value='all', limit=1).get('seriess', []); top = t[0]['last_updated'] if t else None
+        up = fred.updates_list(); log('FRED update list:', len(up))
     have = R.st.index
     lu_new = pd.Series(up); lu_new = lu_new[lu_new.index.isin(have)]
     old = R.st.loc[lu_new.index, 'fred_lu']
@@ -189,16 +202,24 @@ def main():
     tso = pd.concat([tso, mt], axis=1).max(axis=1)
     todo = list(lu_new[(tso.isna()) | (tsn > tso)].index)
     pend = f'{STATE}/pending.json'
-    if os.path.exists(pend): todo = [s for s in json.load(open(pend)) if s in have] + [s for s in todo if s not in set(json.load(open(pend)))]
-    fs = set(forced); todo = forced + [s for s in todo if s not in fs]
+    # 1116: what FRED has just published goes first; then the series a Mac patch replaced; then what an earlier run left
+    # (a new release used to wait behind the whole backlog: 73,856 patched series = 11 hours at FRED's pace)
+    left0 = [s for s in json.load(open(pend)) if s in have] if os.path.exists(pend) else []
+    seen_ = set(); order = []
+    for s in todo + forced + left0:
+        if s not in seen_: seen_.add(s); order.append(s)
+    todo = order
     newser = sorted(set(up) - set(R.st.index))
-    pd.DataFrame({'series_id': newser}).to_csv(f'{STATE}/new_series.csv', index=False)
+    if not fresh_mode: pd.DataFrame({'series_id': newser}).to_csv(f'{STATE}/new_series.csv', index=False)
     log('to update:', len(todo), '| listed by FRED but not held (left to the Mac for now):', len(newser))
     def write_lu(left):                                 # for precheck.py: our FRED stamp of every listed series we hold
         import gzip
-        lu = {s: str(R.get(s, 'fred_lu')) for s in up if s in R.st.index}; lu['_pending'] = left; lu['_patches'] = R.applied_count
+        lu = {s: str(R.get(s, 'fred_lu')) for s in up if s in R.st.index}; lu['_patches'] = R.applied_count
+        lu['_pending'] = left + sum(1 for x in R.log if x[2] == 'error')      # 1116: a fetch error is tried again at the next check
+        if top: lu['_seen'] = top                                             # 1116: FRED's newest stamp when this pass began
         f = os.environ.get('LU_FILE', '/tmp/hrtd_lu/lu.json.gz'); os.makedirs(os.path.dirname(f), exist_ok=True)
         with gzip.open(f, 'wt') as fh: json.dump(lu, fh)
+        with gzip.open(os.path.dirname(f) + '/held.txt.gz', 'wt') as fh: fh.write('\n'.join(R.st.index))   # 1116: for the check
     def output(k, v):
         if os.environ.get('GITHUB_OUTPUT'):
             with open(os.environ['GITHUB_OUTPUT'], 'a') as fh: fh.write(f'{k}={v}\n')
@@ -212,7 +233,11 @@ def main():
         pd.DataFrame(R.log, columns=['at', 'series_id', 'result', 'note']).to_csv(f'{STATE}/last_run_log.csv', index=False); R.changed_files.add('state/last_run_log.csv')
         if final: write_lu(len(left))
         log('checked:', tot, '| files changed:', len(R.changed_files), '| left:', len(left))
-        if not DRY:
+        # 1116: the state is uploaded (93 MB) only when a print was added or a patch applied; stamps alone stay on the
+        # runner's disk and ride in the next upload (lost with the runner, they are only asked again)
+        worth = bool(R.patches_applied) or any(x[2] == 'added' for x in R.log)
+        if not worth: log('nothing added: state kept on the runner, no upload')
+        if not DRY and worth:
             name, size = store.save_delta(WORK, sorted(R.changed_files), time.strftime('%Y%m%dT%H%M%SZ', time.gmtime()), DL)
             store.commit(f'state: {done} series checked, {len(left)} left ({name}, {size >> 20} MB)'); log('saved', name)
             if len(store.head()['order']) > 8:           # keep restores fast: one new base, then the old files go
