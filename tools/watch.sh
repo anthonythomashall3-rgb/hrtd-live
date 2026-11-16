@@ -22,9 +22,9 @@ while [ $SECONDS -lt $END ]; do
   if [ "$force" = true ]; then echo "run=true" > "$OUT"; force=false
   else GITHUB_OUTPUT="$OUT" python -m hrtd.precheck | sed "s/^/$(date -u +%T) /" || echo "check failed"; fi
   if grep -q '^run=true' "$OUT" || { [ $need_deploy = 1 ] && [ $restored = 0 ]; }; then
-    # a pass works for at most PASS_MIN minutes (default 8) and then saves and deploys, so during a long backlog a new
+    # a pass works for at most PASS_MIN minutes (default 5) and then saves and deploys, so during a long backlog a new
     # release is on the site within minutes (new stamps are always fetched first)
-    left=$(( (END - SECONDS) / 60 )); [ "$left" -gt "${PASS_MIN:-8}" ] && left="${PASS_MIN:-8}"
+    left=$(( (END - SECONDS) / 60 )); [ "$left" -gt "${PASS_MIN:-5}" ] && left="${PASS_MIN:-5}"
     [ "$left" -lt 2 ] && break
     : > "$OUT"
     if [ $restored = 1 ]; then export NO_RESTORE=1; else unset NO_RESTORE; rm -rf "$WORK"; fi

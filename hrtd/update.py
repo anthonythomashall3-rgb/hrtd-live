@@ -238,6 +238,12 @@ def main():
     for s in todo + forced + left0:
         if s not in seen_: seen_.add(s); order.append(s)
     todo = order
+    # 1116 (later): a pass that has new stamps from the check does ONLY those, then saves and deploys at once; the backlog
+    # (patched series, leftovers) waits in `hold` and is worked in the passes with nothing new. Measured in job 43896309293:
+    # 7 new series found 16:05:08, deployed 16:14:37, because the pass first spent its 8 minutes on the backlog.
+    hold = []
+    if fresh_mode and up:
+        fr = set(up); hold = [s for s in todo if s not in fr]; todo = [s for s in todo if s in fr]
     newser = sorted(set(up) - set(R.st.index))
     if not fresh_mode: pd.DataFrame({'series_id': newser}).to_csv(f'{STATE}/new_series.csv', index=False)
     log('to update:', len(todo), '| listed by FRED but not held (left to the Mac for now):', len(newser))
@@ -253,14 +259,17 @@ def main():
         if os.environ.get('GITHUB_OUTPUT'):
             with open(os.environ['GITHUB_OUTPUT'], 'a') as fh: fh.write(f'{k}={v}\n')
     rj0 = json.load(open(f'{STATE}/new_rejects.json')) if os.path.exists(f'{STATE}/new_rejects.json') else {}
-    cands = [] if fresh_mode else [s for s in newser if not (s in rj0 and (rj0[s][0].startswith('not U.S.') or rj0[s][1] == up.get(s)))]
+    if fresh_mode:   # the candidates the last whole-list pass wrote; looked at only in a pass with nothing new (2 minutes)
+        nsf = f'{STATE}/new_series.csv'
+        cands = [] if (up or not os.path.exists(nsf)) else [s for s in pd.read_csv(nsf, dtype=str).series_id if s not in rj0 and s not in R.st.index]
+    else: cands = [s for s in newser if not (s in rj0 and (rj0[s][0].startswith('not U.S.') or rj0[s][1] == up.get(s)))]
     new_left = [0]
     if not todo and not R.patches_applied and not cands:
-        write_lu(0); output('changed', 'false'); log('nothing new: no save, no deploy'); return
+        write_lu(len(hold)); output('changed', 'false'); log('nothing new: no save, no deploy'); return
     done = 0; last_save = time.time(); stamp = time.strftime('%Y%m%dT%H%M%SZ', time.gmtime())
     def checkpoint(final):
         nonlocal last_save
-        tot = R.check_and_write(); left = todo[done:]
+        tot = R.check_and_write(); left = todo[done:] + hold
         json.dump(left, open(pend, 'w')); R.changed_files.add('state/pending.json'); R.save_state()
         pd.DataFrame(R.log, columns=['at', 'series_id', 'result', 'note']).to_csv(f'{STATE}/last_run_log.csv', index=False); R.changed_files.add('state/last_run_log.csv')
         if final: write_lu(len(left))
@@ -296,7 +305,7 @@ def main():
                 if s2: futs[ex.submit(R.one, s2)] = s2
             if done % 500 == 0: log(f'{done}/{len(todo)} | FRED requests {fred.COUNT}')
             if (time.time() - last_save) / 60 > CHECK_MIN: checkpoint(False)
-    if cands: new_left[0] = R.add_new(cands, up, time.time() + float(os.environ.get('NEW_MIN', '4')) * 60)   # its own few minutes, so a backlog never starves it
+    if cands: new_left[0] = R.add_new(cands, up, time.time() + float(os.environ.get('NEW_MIN', '2' if fresh_mode else '4')) * 60)   # its own few minutes, so a backlog never starves it
     checkpoint(True)
     kinds = pd.Series([x[2] for x in R.log]).value_counts().to_dict() if R.log else {}
     log('done:', done, 'of', len(todo), kinds)
