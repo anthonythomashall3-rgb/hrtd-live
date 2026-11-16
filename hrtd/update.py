@@ -12,7 +12,7 @@ import os, sys, json, time, zlib, datetime as dt, traceback
 from concurrent.futures import ThreadPoolExecutor
 import pandas as pd
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from hrtd import rule, fred, site, store
+from hrtd import rule, fred, site, store, newseries
 
 WORK = os.environ.get('WORK', '/tmp/hrtd_work'); DL = WORK + '_dl'
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -77,6 +77,35 @@ class Run:
         json.dump(applied, open(af, 'w')); self.changed_files.add('state/applied_patches.json')
         self.applied_count = len(applied)
         return [s for s in self.patched if s in self.st.index]
+
+    def add_new(self, cands, up, t_end):
+        """1116: series FRED lists that we do not hold (newseries.py): added when plainly U.S. and of a held release"""
+        rj = f'{STATE}/new_rejects.json'; rej = json.load(open(rj)) if os.path.exists(rj) else {}
+        rel_agency = {}
+        for r in self.rows.values(): rel_agency.setdefault(r[7], r[6])
+        todo = [s for s in cands if not (s in rej and (rej[s][0].startswith('not U.S.') or rej[s][1] == up.get(s)))]
+        new = {}; n = 0
+        for sid in todo:
+            if time.time() > t_end: break
+            n += 1
+            try: out = newseries.new_record(sid, rel_agency, self.maps)
+            except Exception as e:
+                self.log.append((now(), sid, 'new_error', f'{type(e).__name__}: {str(e)[:160]}')); continue
+            if isinstance(out, str): rej[sid] = [out, up.get(sid)]; continue
+            rec, row, popu = out
+            k = zlib.crc32(sid.encode()) % site.NSHARD; self.shard(k)[sid] = rec; self.dirty.add(k)
+            self.rows[sid] = site.meta_row(sid, rec); self.pop[sid] = popu; new[sid] = row
+            self.log.append((now(), sid, 'added', f'new series: {len(rec["p"])} first prints'))
+        if new:
+            add = pd.DataFrame(list(new.values()), index=pd.Index(list(new), name=self.st.index.name))
+            for c in self.st.columns:
+                if c not in add.columns: add[c] = None
+            self.st = pd.concat([self.st, add[self.st.columns].astype(self.st.dtypes.to_dict())])
+            pd.DataFrame(list(self.pop.items()), columns=['series_id', 'popularity']).to_parquet(f'{STATE}/pop.parquet', index=False)
+            self.changed_files.add('state/pop.parquet')
+        json.dump(rej, open(rj, 'w')); self.changed_files.add('state/new_rejects.json')
+        log('new series: looked at', n, 'of', len(todo), '| added', len(new))
+        return len(todo) - n
 
     def shard(self, k):
         if k not in self.shards: self.shards[k] = json.load(open(f'{SITE}/d/{k}.json'))
@@ -215,7 +244,7 @@ def main():
     def write_lu(left):                                 # for precheck.py: our FRED stamp of every listed series we hold
         import gzip
         lu = {s: str(R.get(s, 'fred_lu')) for s in up if s in R.st.index}; lu['_patches'] = R.applied_count
-        lu['_pending'] = left + sum(1 for x in R.log if x[2] == 'error')      # 1116: a fetch error is tried again at the next check
+        lu['_pending'] = left + new_left[0] + sum(1 for x in R.log if x[2] == 'error')      # 1116: a fetch error is tried again at the next check
         if top: lu['_seen'] = top                                             # 1116: FRED's newest stamp when this pass began
         f = os.environ.get('LU_FILE', '/tmp/hrtd_lu/lu.json.gz'); os.makedirs(os.path.dirname(f), exist_ok=True)
         with gzip.open(f, 'wt') as fh: json.dump(lu, fh)
@@ -223,7 +252,10 @@ def main():
     def output(k, v):
         if os.environ.get('GITHUB_OUTPUT'):
             with open(os.environ['GITHUB_OUTPUT'], 'a') as fh: fh.write(f'{k}={v}\n')
-    if not todo and not R.patches_applied:
+    rj0 = json.load(open(f'{STATE}/new_rejects.json')) if os.path.exists(f'{STATE}/new_rejects.json') else {}
+    cands = [] if fresh_mode else [s for s in newser if not (s in rj0 and (rj0[s][0].startswith('not U.S.') or rj0[s][1] == up.get(s)))]
+    new_left = [0]
+    if not todo and not R.patches_applied and not cands:
         write_lu(0); output('changed', 'false'); log('nothing new: no save, no deploy'); return
     done = 0; last_save = time.time(); stamp = time.strftime('%Y%m%dT%H%M%SZ', time.gmtime())
     def checkpoint(final):
@@ -258,6 +290,7 @@ def main():
                 if s2: futs[ex.submit(R.one, s2)] = s2
             if done % 500 == 0: log(f'{done}/{len(todo)} | FRED requests {fred.COUNT}')
             if (time.time() - last_save) / 60 > CHECK_MIN: checkpoint(False)
+    if cands: new_left[0] = R.add_new(cands, up, T0 + MAX_MIN * 60)
     checkpoint(True)
     kinds = pd.Series([x[2] for x in R.log]).value_counts().to_dict() if R.log else {}
     log('done:', done, 'of', len(todo), kinds)
