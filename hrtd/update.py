@@ -267,8 +267,14 @@ def main():
         log('checked:', tot, '| files changed:', len(R.changed_files), '| left:', len(left))
         # 1116: the state is uploaded (93 MB) only when a print was added or a patch applied; stamps alone stay on the
         # runner's disk and ride in the next upload (lost with the runner, they are only asked again)
-        worth = bool(R.patches_applied) or any(x[2] == 'added' for x in R.log)
+        # ... but at least every UPLOAD_MIN minutes (default 45) while series are being worked through, so a job that ends
+        # (5 hours) loses at most that much of a long backlog (71,505 patched series = 12 hours of fetching)
+        mark = WORK + '_last_upload'
+        if not os.path.exists(mark): open(mark, 'w').close()
+        due = bool(R.upd) and (time.time() - os.path.getmtime(mark)) / 60 > float(os.environ.get('UPLOAD_MIN', '45'))
+        worth = bool(R.patches_applied) or any(x[2] == 'added' for x in R.log) or due
         if not worth: log('nothing added: state kept on the runner, no upload')
+        if not DRY and worth: os.utime(mark, None)
         if not DRY and worth:
             name, size = store.save_delta(WORK, sorted(R.changed_files), time.strftime('%Y%m%dT%H%M%SZ', time.gmtime()), DL)
             store.commit(f'state: {done} series checked, {len(left)} left ({name}, {size >> 20} MB)'); log('saved', name)
