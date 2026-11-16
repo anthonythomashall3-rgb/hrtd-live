@@ -20,5 +20,16 @@
   "meta": 0,
   "append_only": 0,
   "same": 669333
+ },
+ {
+  "name": "patch-20261116T050549Z.tar.zst",
+  "sha256": "037383e0270478e0467cae29d9a428db14d4505f79c8c8bf41a9d3c1adef76ff",
+  "created": "2026-11-16T05:05:49Z",
+  "series": 10675,
+  "new": 115,
+  "history": 10560,
+  "meta": 0,
+  "append_only": 4,
+  "same": 670593
  }
 ]
