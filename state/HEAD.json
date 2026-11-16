@@ -1,6 +1,19 @@
 {
  "assets": [
   [
+   "base-20261116T093121Z.tar.zst.part00",
+   "573187d39f7f8b7df5da0dfe36acce9d9f3b4b844d5b3e7e94bbd618a03da02d"
+  ]
+ ],
+ "order": [
+  [
+   "base-20261116T093121Z.tar.zst.part00"
+  ]
+ ],
+ "updated": "20261116T093121Z",
+ "base": "20261116T093121Z",
+ "previous": [
+  [
    "base-20261115T144524Z.tar.zst.part00",
    "8887b11330788bfe7b575e03037d645e3b0ccf58a6915945c93b04cdca0995d0"
   ],
@@ -36,37 +49,5 @@
    "delta-20261116T093114Z.tar.zst",
    "8a56932de88b78f634a3501585bf097166d1a63135cec4cea532d57cf58c51c8"
   ]
- ],
- "order": [
-  [
-   "base-20261115T144524Z.tar.zst.part00"
-  ],
-  [
-   "delta-20261115T145105Z.tar.zst"
-  ],
-  [
-   "delta-20261115T164201Z.tar.zst"
-  ],
-  [
-   "delta-20261116T015555Z.tar.zst"
-  ],
-  [
-   "delta-20261116T024158Z.tar.zst"
-  ],
-  [
-   "delta-20261116T032743Z.tar.zst"
-  ],
-  [
-   "delta-20261116T034552Z.tar.zst"
-  ],
-  [
-   "delta-20261116T084514Z.tar.zst"
-  ],
-  [
-   "delta-20261116T093114Z.tar.zst"
-  ]
- ],
- "updated": "20261116T093114Z",
- "base": "20261115T144524Z",
- "previous": []
+ ]
 }
