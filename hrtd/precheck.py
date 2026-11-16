@@ -20,7 +20,6 @@ pend = have.get('_pending', 0)
 pl = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'state', 'patches.json')
 npatch = len(json.load(open(pl))) if os.path.exists(pl) else 0
 if npatch > have.get('_patches', 0): out(True, f'{npatch - have.get("_patches", 0)} history patch(es) from the Mac to apply'); sys.exit(0)
-if pend: out(True, f'{pend} series left from the last run'); sys.exit(0)
 # 1116: FRED lists updates newest first, so only the top of the list is read: down to the stamp the last pass began at
 # (one request when nothing is new; the whole list was 119 requests and over a minute). A held series counts whether or not
 # it was on the list last time (a quarterly series falls off the two-week list between its releases).
@@ -35,5 +34,6 @@ while True:
     fresh.update({s['id']: s['last_updated'] for s in newer if s['id'] in held})
     off += len(ss)
     if len(newer) < len(ss) or off >= int(d.get('count', 0)): break
-if fresh and FRESH: json.dump({'_top': top, 'ids': fresh}, open(FRESH, 'w'))
-out(bool(fresh), f'{len(fresh)} held series newer than {seen} ({n} on FRED)')
+# 1116: leftovers no longer send the pass through the whole list (119 requests): new stamps and leftovers go together
+if (fresh or pend) and FRESH and top: json.dump({'_top': top, 'ids': fresh}, open(FRESH, 'w'))
+out(bool(fresh or pend), f'{len(fresh)} held series newer than {seen} ({n} on FRED); {pend} left from the last pass')

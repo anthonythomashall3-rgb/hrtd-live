@@ -7,6 +7,7 @@
 set -u
 END=$((SECONDS + ${WATCH_MIN:-310} * 60))
 OUT=$(mktemp); restored=0; need_deploy=0; force="${FORCE:-false}"
+git config user.name "hrtd runner"; git config user.email "hrtd@users.noreply.github.com"   # a rebase needs a committer
 deploy() {
   D=/mnt/hrtd/deploy; rm -rf "$D"; mkdir -p "$D"
   cp -R web/. "$D/"; cp -al "$WORK/site/data" "$D/data"
@@ -15,12 +16,15 @@ deploy() {
   npx --yes wrangler@4 pages deploy "$D" --project-name hrtd --branch "$DEPLOY_BRANCH" --commit-dirty=true
 }
 while [ $SECONDS -lt $END ]; do
+  git rebase --abort 2>/dev/null; git reset -q   # nothing half-done or staged is carried into the pull
   git pull -q --rebase origin main || echo "$(date -u +%T) git pull failed (tried again at the next check)"
   : > "$OUT"
   if [ "$force" = true ]; then echo "run=true" > "$OUT"; force=false
   else GITHUB_OUTPUT="$OUT" python -m hrtd.precheck | sed "s/^/$(date -u +%T) /" || echo "check failed"; fi
   if grep -q '^run=true' "$OUT" || { [ $need_deploy = 1 ] && [ $restored = 0 ]; }; then
-    left=$(( (END - SECONDS) / 60 )); [ "$left" -gt 25 ] && left=25
+    # a pass works for at most PASS_MIN minutes (default 8) and then saves and deploys, so during a long backlog a new
+    # release is on the site within minutes (new stamps are always fetched first)
+    left=$(( (END - SECONDS) / 60 )); [ "$left" -gt "${PASS_MIN:-8}" ] && left="${PASS_MIN:-8}"
     [ "$left" -lt 2 ] && break
     : > "$OUT"
     if [ $restored = 1 ]; then export NO_RESTORE=1; else unset NO_RESTORE; rm -rf "$WORK"; fi

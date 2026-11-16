@@ -296,7 +296,7 @@ def main():
                 if s2: futs[ex.submit(R.one, s2)] = s2
             if done % 500 == 0: log(f'{done}/{len(todo)} | FRED requests {fred.COUNT}')
             if (time.time() - last_save) / 60 > CHECK_MIN: checkpoint(False)
-    if cands: new_left[0] = R.add_new(cands, up, T0 + MAX_MIN * 60)
+    if cands: new_left[0] = R.add_new(cands, up, time.time() + float(os.environ.get('NEW_MIN', '4')) * 60)   # its own few minutes, so a backlog never starves it
     checkpoint(True)
     kinds = pd.Series([x[2] for x in R.log]).value_counts().to_dict() if R.log else {}
     log('done:', done, 'of', len(todo), kinds)

@@ -94,4 +94,7 @@ def commit(msg):
         try: sh('git', '-C', HERE, 'push', 'origin', 'HEAD'); return True
         except subprocess.CalledProcessError:
             if i == 4: raise
-            sh('git', '-C', HERE, 'pull', '--rebase', 'origin', 'main'); time.sleep(5)
+            # 1116: the rebase needs a committer too (without one git stopped with status 128 whenever another push had
+            # landed first, and every pass of run 43876861947 failed at this line); a rebase left half-done is dropped
+            subprocess.run(['git', '-C', HERE, 'rebase', '--abort'], capture_output=True)
+            sh('git', '-C', HERE, '-c', 'user.name=hrtd runner', '-c', 'user.email=hrtd@users.noreply.github.com', 'pull', '--rebase', 'origin', 'main'); time.sleep(5)
