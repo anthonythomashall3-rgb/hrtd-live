@@ -19,7 +19,7 @@ concurrency:
   group: hrtd-update
   cancel-in-progress: false
 env:
-  DEPLOY_BRANCH: github
+  DEPLOY_BRANCH: main
   WORK: /mnt/hrtd/work
   LU_FILE: /mnt/hrtd/lu/lu.json.gz
   FRESH_FILE: /mnt/hrtd/lu/fresh.json
