@@ -3,14 +3,21 @@
   [
    "base-20261117T170632Z.tar.zst.part00",
    "eca0dc551645bb606c39cafa6d9a91a3650d8fad28c07fa4e85f2703882d0b92"
+  ],
+  [
+   "delta-20261117T171614Z.tar.zst",
+   "60da07a12446a22a7c2293df988f0d4958c5e59be8fea834927388e543ec7848"
   ]
  ],
  "order": [
   [
    "base-20261117T170632Z.tar.zst.part00"
+  ],
+  [
+   "delta-20261117T171614Z.tar.zst"
   ]
  ],
- "updated": "20261117T170632Z",
+ "updated": "20261117T171614Z",
  "base": "20261117T170632Z",
  "previous": [
   [
