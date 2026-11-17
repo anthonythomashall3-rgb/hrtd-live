@@ -15,6 +15,7 @@ on:
 permissions:
   contents: write
   actions: write
+  issues: write      # 1116: a failing job opens an issue (tools/watch.sh)
 concurrency:
   group: hrtd-update
   cancel-in-progress: false
@@ -52,6 +53,7 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           FORCE: ${{ inputs.force }}
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
         run: bash tools/watch.sh
       - name: save our FRED stamps
         if: always()
@@ -59,6 +61,15 @@ jobs:
         with:
           path: /mnt/hrtd/lu
           key: hrtd-lu-${{ github.run_id }}
+      - name: a job that failed outside the watch tells Anthony
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        run: |
+          MSG="hrtd.pages.dev: the GitHub job failed at $(date -u '+%Y-%m-%d %H:%M UTC'); the next job is started. Run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          if [ -n "$NTFY_TOPIC" ]; then curl -fsS -m 15 -H "Title: HRTD job failed" -d "$MSG" "https://ntfy.sh/$NTFY_TOPIC" >/dev/null || true; fi
+          gh issue create -R "$GITHUB_REPOSITORY" --title "HRTD update failing" --body "$MSG" || true
       - name: start the next run (GitHub's schedule is not dependable)
         if: ${{ !cancelled() }}
         env:
