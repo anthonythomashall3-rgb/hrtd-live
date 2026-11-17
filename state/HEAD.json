@@ -19,6 +19,10 @@
   [
    "delta-20261117T222004Z.tar.zst",
    "1448732fd60598ea6a4417682e751c677b200cfa546840258d264542bf7db03a"
+  ],
+  [
+   "delta-20261117T222856Z.tar.zst",
+   "1ab6925e717a6df01528a50cef5143640eb683db4c076fabf2754fc888bfcb5d"
   ]
  ],
  "order": [
@@ -36,9 +40,12 @@
   ],
   [
    "delta-20261117T222004Z.tar.zst"
+  ],
+  [
+   "delta-20261117T222856Z.tar.zst"
   ]
  ],
- "updated": "20261117T222004Z",
+ "updated": "20261117T222856Z",
  "base": "20261117T220004Z",
  "previous": [
   [
