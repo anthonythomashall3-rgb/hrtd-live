@@ -7,6 +7,10 @@
   [
    "delta-20261117T102705Z.tar.zst",
    "f83da73c8b55abd0fd5b514a7057c2a4fc2ecfca532dbf9a1b473997a26b3ac0"
+  ],
+  [
+   "delta-20261117T104431Z.tar.zst",
+   "3eed6ca5a49c0c6c179bbd5e013d63235ed84025d9db7cde0a0468d88a3f7470"
   ]
  ],
  "order": [
@@ -15,9 +19,12 @@
   ],
   [
    "delta-20261117T102705Z.tar.zst"
+  ],
+  [
+   "delta-20261117T104431Z.tar.zst"
   ]
  ],
- "updated": "20261117T102705Z",
+ "updated": "20261117T104431Z",
  "base": "20261117T101741Z",
  "previous": [
   [
