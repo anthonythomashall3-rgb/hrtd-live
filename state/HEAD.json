@@ -7,6 +7,10 @@
   [
    "delta-20261117T150701Z.tar.zst",
    "11cb350ce6799834bb76609cf3ff3ca8691f9683adbfa8c0d0ec775da6c376ce"
+  ],
+  [
+   "delta-20261117T152059Z.tar.zst",
+   "cd9f5b23299d5de025f07226c152872f8f51df379781fe898dd9b95252f9b756"
   ]
  ],
  "order": [
@@ -15,9 +19,12 @@
   ],
   [
    "delta-20261117T150701Z.tar.zst"
+  ],
+  [
+   "delta-20261117T152059Z.tar.zst"
   ]
  ],
- "updated": "20261117T150701Z",
+ "updated": "20261117T152059Z",
  "base": "20261117T145717Z",
  "previous": [
   [
