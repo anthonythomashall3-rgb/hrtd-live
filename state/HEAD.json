@@ -23,6 +23,10 @@
   [
    "delta-20261117T012153Z.tar.zst",
    "546bfe8b9175a80684c64cc3b4aa34c48ca70a49cb2b616dfa8979a2682fe014"
+  ],
+  [
+   "delta-20261117T020100Z.tar.zst",
+   "a9550b2a89d4391db9616d509df368628f95de1fb5ceb49d0eda59217f40eade"
   ]
  ],
  "order": [
@@ -43,9 +47,12 @@
   ],
   [
    "delta-20261117T012153Z.tar.zst"
+  ],
+  [
+   "delta-20261117T020100Z.tar.zst"
   ]
  ],
- "updated": "20261117T012153Z",
+ "updated": "20261117T020100Z",
  "base": "20261116T221604Z",
  "previous": [
   [
