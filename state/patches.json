@@ -64,5 +64,16 @@
   "meta": 0,
   "append_only": 298,
   "same": 681316
+ },
+ {
+  "name": "patch-20261117T031954Z.tar.zst",
+  "sha256": "06f142d41f652db062a64940d1e0c1971085080741bb99ffd8b810d397f2568c",
+  "created": "2026-11-17T03:19:54Z",
+  "series": 0,
+  "new": 0,
+  "history": 0,
+  "meta": 0,
+  "append_only": 125,
+  "same": 681491
  }
 ]
