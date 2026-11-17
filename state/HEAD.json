@@ -11,6 +11,10 @@
   [
    "delta-20261117T124600Z.tar.zst",
    "46f6e0de007fae182701579434f6a5409cf00716f0367498abc88cd6f09326af"
+  ],
+  [
+   "delta-20261117T125517Z.tar.zst",
+   "1cc5988c6231079bdcb8223d450463811e3862bb7d77d84d2500b8dab17103dc"
   ]
  ],
  "order": [
@@ -22,9 +26,12 @@
   ],
   [
    "delta-20261117T124600Z.tar.zst"
+  ],
+  [
+   "delta-20261117T125517Z.tar.zst"
   ]
  ],
- "updated": "20261117T124600Z",
+ "updated": "20261117T125517Z",
  "base": "20261117T120632Z",
  "previous": [
   [
