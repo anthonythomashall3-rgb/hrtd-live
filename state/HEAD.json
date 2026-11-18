@@ -23,6 +23,10 @@
   [
    "delta-20261118T094009Z.tar.zst",
    "52c79b16de0b4a702642f9da2ce3141c0bc8af85a815db351767dedf3e59737e"
+  ],
+  [
+   "delta-20261118T094852Z.tar.zst",
+   "f72ebf55178fecb1d97282842fe5ed809cf17555ce8ea3c7f93f3c8fc21aca8f"
   ]
  ],
  "order": [
@@ -43,9 +47,12 @@
   ],
   [
    "delta-20261118T094009Z.tar.zst"
+  ],
+  [
+   "delta-20261118T094852Z.tar.zst"
   ]
  ],
- "updated": "20261118T094009Z",
+ "updated": "20261118T094852Z",
  "base": "20261118T070356Z",
  "previous": [
   [
