@@ -3,14 +3,21 @@
   [
    "base-20261118T053822Z.tar.zst.part00",
    "c11cd3ac7d776e366c6901767446e87d7fa776a02d7c67a2ce08b34bc350ff5c"
+  ],
+  [
+   "delta-20261118T054818Z.tar.zst",
+   "77d8d0fc3187656a5348e5ad01af91da9afb268e233399d95b5ff0f2043dd6d5"
   ]
  ],
  "order": [
   [
    "base-20261118T053822Z.tar.zst.part00"
+  ],
+  [
+   "delta-20261118T054818Z.tar.zst"
   ]
  ],
- "updated": "20261118T053822Z",
+ "updated": "20261118T054818Z",
  "base": "20261118T053822Z",
  "previous": [
   [
