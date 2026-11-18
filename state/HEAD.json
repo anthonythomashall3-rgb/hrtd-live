@@ -3,14 +3,21 @@
   [
    "base-20261118T102304Z.tar.zst.part00",
    "7464e11413e2b62b34cd1f874676ce917b54bfbca18b8c7d965b744105ee5915"
+  ],
+  [
+   "delta-20261118T104033Z.tar.zst",
+   "652029b8a0e6f6debf068cdbe79b9226a16e55311b9328d8dee894aab5bf3db4"
   ]
  ],
  "order": [
   [
    "base-20261118T102304Z.tar.zst.part00"
+  ],
+  [
+   "delta-20261118T104033Z.tar.zst"
   ]
  ],
- "updated": "20261118T102304Z",
+ "updated": "20261118T104033Z",
  "base": "20261118T102304Z",
  "previous": [
   [
