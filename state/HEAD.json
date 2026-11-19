@@ -3,14 +3,21 @@
   [
    "base-20261119T140942Z.tar.zst.part00",
    "d1fb1f311698393e2a7b8c378d2258986ccf79399f86c64c3e9737fae9bc27cc"
+  ],
+  [
+   "delta-20261119T141809Z.tar.zst",
+   "a4eb167733df4920fee5d09e00bb27cda762784c19e006d24a6a81fd056b544e"
   ]
  ],
  "order": [
   [
    "base-20261119T140942Z.tar.zst.part00"
+  ],
+  [
+   "delta-20261119T141809Z.tar.zst"
   ]
  ],
- "updated": "20261119T140942Z",
+ "updated": "20261119T141809Z",
  "base": "20261119T140942Z",
  "previous": [
   [
