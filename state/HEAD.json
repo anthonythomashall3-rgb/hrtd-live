@@ -3,14 +3,21 @@
   [
    "base-20261119T204149Z.tar.zst.part00",
    "64edf757a6b26b1fc5152d70ee9ea8ff4c19e51e3bd81fcefaed40bdd6c921fb"
+  ],
+  [
+   "delta-20261119T205300Z.tar.zst",
+   "06b5f5ca6a7b316282902cb684eccd47ea8cb73dc9a6c57c0c1b255eaa9eebe7"
   ]
  ],
  "order": [
   [
    "base-20261119T204149Z.tar.zst.part00"
+  ],
+  [
+   "delta-20261119T205300Z.tar.zst"
   ]
  ],
- "updated": "20261119T204149Z",
+ "updated": "20261119T205300Z",
  "base": "20261119T204149Z",
  "previous": [
   [
