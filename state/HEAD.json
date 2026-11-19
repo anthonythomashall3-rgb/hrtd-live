@@ -11,6 +11,10 @@
   [
    "delta-20261119T115702Z.tar.zst",
    "83184703b9a7f292cc2a77e3210e0fa7bfec32477e05d8d70c2957e4dfe86540"
+  ],
+  [
+   "delta-20261119T120459Z.tar.zst",
+   "bc408f594e505344811aff37732dee78cdfc2150a26f84992268aa096063203f"
   ]
  ],
  "order": [
@@ -22,9 +26,12 @@
   ],
   [
    "delta-20261119T115702Z.tar.zst"
+  ],
+  [
+   "delta-20261119T120459Z.tar.zst"
   ]
  ],
- "updated": "20261119T115702Z",
+ "updated": "20261119T120459Z",
  "base": "20261119T104916Z",
  "previous": [
   [
