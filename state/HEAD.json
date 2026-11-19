@@ -3,14 +3,21 @@
   [
    "base-20261119T010844Z.tar.zst.part00",
    "e52e0c56945214cb15e47bda753e0fadfa6a0ef0cac934a4bd01297c7729bfce"
+  ],
+  [
+   "delta-20261119T015908Z.tar.zst",
+   "ea9dc86d6ab989ffb6cf48c452741b9286fe5c1639c0e6ff87d061f6ada14cb0"
   ]
  ],
  "order": [
   [
    "base-20261119T010844Z.tar.zst.part00"
+  ],
+  [
+   "delta-20261119T015908Z.tar.zst"
   ]
  ],
- "updated": "20261119T010844Z",
+ "updated": "20261119T015908Z",
  "base": "20261119T010844Z",
  "previous": [
   [
