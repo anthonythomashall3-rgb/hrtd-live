@@ -3,14 +3,21 @@
   [
    "base-20261119T050359Z.tar.zst.part00",
    "90fa4337178c6e7053b1fbf276e8fff4037b2c23c3e9b260ded3ad3a7b9460e7"
+  ],
+  [
+   "delta-20261119T051346Z.tar.zst",
+   "8dd6061f337955828102e1cbe34d74dd0491220d2d9ee90c957da104e3e2f422"
   ]
  ],
  "order": [
   [
    "base-20261119T050359Z.tar.zst.part00"
+  ],
+  [
+   "delta-20261119T051346Z.tar.zst"
   ]
  ],
- "updated": "20261119T050359Z",
+ "updated": "20261119T051346Z",
  "base": "20261119T050359Z",
  "previous": [
   [
