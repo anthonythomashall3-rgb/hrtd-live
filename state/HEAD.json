@@ -7,6 +7,10 @@
   [
    "delta-20261119T065635Z.tar.zst",
    "7a030c3efbc8f6a56a0bb6c162fedd726a4cac4479a0fa79b73e8f43328027b5"
+  ],
+  [
+   "delta-20261119T070604Z.tar.zst",
+   "8aa551a23d5a272e668b47d7f7f559132cdb6cb3b9ad23a2573d55a05a1de458"
   ]
  ],
  "order": [
@@ -15,9 +19,12 @@
   ],
   [
    "delta-20261119T065635Z.tar.zst"
+  ],
+  [
+   "delta-20261119T070604Z.tar.zst"
   ]
  ],
- "updated": "20261119T065635Z",
+ "updated": "20261119T070604Z",
  "base": "20261119T064640Z",
  "previous": [
   [
