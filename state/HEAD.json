@@ -7,6 +7,10 @@
   [
    "delta-20261119T205300Z.tar.zst",
    "06b5f5ca6a7b316282902cb684eccd47ea8cb73dc9a6c57c0c1b255eaa9eebe7"
+  ],
+  [
+   "delta-20261119T210708Z.tar.zst",
+   "b85ef0fb4b54fefee995d906b677a5b5ae04a7ecc0db0fa8f2cc5262757ebf04"
   ]
  ],
  "order": [
@@ -15,9 +19,12 @@
   ],
   [
    "delta-20261119T205300Z.tar.zst"
+  ],
+  [
+   "delta-20261119T210708Z.tar.zst"
   ]
  ],
- "updated": "20261119T205300Z",
+ "updated": "20261119T210708Z",
  "base": "20261119T204149Z",
  "previous": [
   [
