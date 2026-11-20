@@ -19,6 +19,10 @@
   [
    "delta-20261120T164814Z.tar.zst",
    "36bd48a118489f3411527a6f1e8a0aa059492294a362140819b3567630170a89"
+  ],
+  [
+   "delta-20261120T165533Z.tar.zst",
+   "97cd9e37eb9ae52e59fbb64bea67a6b70679fb652c46b128293ae7ec6e395a85"
   ]
  ],
  "order": [
@@ -36,9 +40,12 @@
   ],
   [
    "delta-20261120T164814Z.tar.zst"
+  ],
+  [
+   "delta-20261120T165533Z.tar.zst"
   ]
  ],
- "updated": "20261120T164814Z",
+ "updated": "20261120T165533Z",
  "base": "20261120T161829Z",
  "previous": [
   [
