@@ -3,14 +3,21 @@
   [
    "base-20261120T161829Z.tar.zst.part00",
    "c1749fbe5982bd56c46fac51d15d6246815c6566c8458e1f3a110b107bc371cf"
+  ],
+  [
+   "delta-20261120T162619Z.tar.zst",
+   "f261d6e3bf1fa23da39ae20c3b24969c5109cb1db06388ad6e685734f6b10b68"
   ]
  ],
  "order": [
   [
    "base-20261120T161829Z.tar.zst.part00"
+  ],
+  [
+   "delta-20261120T162619Z.tar.zst"
   ]
  ],
- "updated": "20261120T161829Z",
+ "updated": "20261120T162619Z",
  "base": "20261120T161829Z",
  "previous": [
   [
