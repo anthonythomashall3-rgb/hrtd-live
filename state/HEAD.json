@@ -3,14 +3,21 @@
   [
    "base-20261120T203447Z.tar.zst.part00",
    "e5f32d9760e80ae0d94ccfd83a3165ff00d0af660a597c6b6ff0afcd424a4e1c"
+  ],
+  [
+   "delta-20261120T204248Z.tar.zst",
+   "cb173f776690c1fdf1e80de7758574619e981ed880702ab764c1d6210c4e67c8"
   ]
  ],
  "order": [
   [
    "base-20261120T203447Z.tar.zst.part00"
+  ],
+  [
+   "delta-20261120T204248Z.tar.zst"
   ]
  ],
- "updated": "20261120T203447Z",
+ "updated": "20261120T204248Z",
  "base": "20261120T203447Z",
  "previous": [
   [
