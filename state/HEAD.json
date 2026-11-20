@@ -15,6 +15,10 @@
   [
    "delta-20261120T005320Z.tar.zst",
    "8a6f83d02ec93ef46eb15fb0d2da1a0e1871a47b425ce5009ad75d206c89b5b5"
+  ],
+  [
+   "delta-20261120T011437Z.tar.zst",
+   "5a3958e9a52647cb6012065ca4dd9d759476a85fa7f71866c0dc67e323eba8ab"
   ]
  ],
  "order": [
@@ -29,9 +33,12 @@
   ],
   [
    "delta-20261120T005320Z.tar.zst"
+  ],
+  [
+   "delta-20261120T011437Z.tar.zst"
   ]
  ],
- "updated": "20261120T005320Z",
+ "updated": "20261120T011437Z",
  "base": "20261119T225327Z",
  "previous": [
   [
