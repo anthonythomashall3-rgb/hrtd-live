@@ -3,14 +3,21 @@
   [
    "base-20261120T140850Z.tar.zst.part00",
    "7efdd1dcfd0ba953a8c4414c5baef330e1123b213833faa1411415c65ed7ac3b"
+  ],
+  [
+   "delta-20261120T141805Z.tar.zst",
+   "a6866ff400647c29bc75b87f79b2e5ad1cb1b05a16cd4607126db9c6acfc7057"
   ]
  ],
  "order": [
   [
    "base-20261120T140850Z.tar.zst.part00"
+  ],
+  [
+   "delta-20261120T141805Z.tar.zst"
   ]
  ],
- "updated": "20261120T140850Z",
+ "updated": "20261120T141805Z",
  "base": "20261120T140850Z",
  "previous": [
   [
