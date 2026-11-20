@@ -3,14 +3,21 @@
   [
    "base-20261120T055738Z.tar.zst.part00",
    "78c99f6da1bc4127293a61e61bfa3b2e85affc6337c8df20095ed2b9cfc29c84"
+  ],
+  [
+   "delta-20261120T060500Z.tar.zst",
+   "14f57a36d2f107fb5f8fb19d0367ed367fa485ac41afa85b4e26026b8dd9ec70"
   ]
  ],
  "order": [
   [
    "base-20261120T055738Z.tar.zst.part00"
+  ],
+  [
+   "delta-20261120T060500Z.tar.zst"
   ]
  ],
- "updated": "20261120T055738Z",
+ "updated": "20261120T060500Z",
  "base": "20261120T055738Z",
  "previous": [
   [
