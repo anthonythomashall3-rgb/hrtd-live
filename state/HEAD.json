@@ -15,6 +15,10 @@
   [
    "delta-20261120T224255Z.tar.zst",
    "5603f36a4e1e8ed17efc8b8e73227d2d08ca685fc2918ad30fdc485f268a6a66"
+  ],
+  [
+   "delta-20261120T225012Z.tar.zst",
+   "8349bfc2666a660786e9d0c15e24b542063901800e2dd57e9a245738a7a26687"
   ]
  ],
  "order": [
@@ -29,9 +33,12 @@
   ],
   [
    "delta-20261120T224255Z.tar.zst"
+  ],
+  [
+   "delta-20261120T225012Z.tar.zst"
   ]
  ],
- "updated": "20261120T224255Z",
+ "updated": "20261120T225012Z",
  "base": "20261120T222036Z",
  "previous": [
   [
