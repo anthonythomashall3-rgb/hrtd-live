@@ -27,6 +27,10 @@
   [
    "delta-20261120T044453Z.tar.zst",
    "ac444b06a4c35c9d45b9e70884ee8d590776113c6158144ab4f1cc0d8ef9182d"
+  ],
+  [
+   "delta-20261120T045201Z.tar.zst",
+   "c984e1cb67140488d1dc1066f8c2905bb061687317b9b08d53b5c6b6c960b24e"
   ]
  ],
  "order": [
@@ -50,9 +54,12 @@
   ],
   [
    "delta-20261120T044453Z.tar.zst"
+  ],
+  [
+   "delta-20261120T045201Z.tar.zst"
   ]
  ],
- "updated": "20261120T044453Z",
+ "updated": "20261120T045201Z",
  "base": "20261119T225327Z",
  "previous": [
   [
