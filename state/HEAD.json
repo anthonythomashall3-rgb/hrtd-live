@@ -3,14 +3,21 @@
   [
    "base-20261121T083932Z.tar.zst.part00",
    "dc6e23933a2f4820524647b3b25ff2a6f17391b9411ee4dc81c1ce440e7455a9"
+  ],
+  [
+   "delta-20261121T085844Z.tar.zst",
+   "cd4ab7647dc54ed5c281958950fae8b79316efdf7eef296d0691d037ec4a93db"
   ]
  ],
  "order": [
   [
    "base-20261121T083932Z.tar.zst.part00"
+  ],
+  [
+   "delta-20261121T085844Z.tar.zst"
   ]
  ],
- "updated": "20261121T083932Z",
+ "updated": "20261121T085844Z",
  "base": "20261121T083932Z",
  "previous": [
   [
