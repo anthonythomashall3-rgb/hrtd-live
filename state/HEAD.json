@@ -19,6 +19,10 @@
   [
    "delta-20261121T140559Z.tar.zst",
    "92456893f1dd9a74aaabed62849120995e3db799b5152b6ceeafdf693541f7a4"
+  ],
+  [
+   "delta-20261121T144330Z.tar.zst",
+   "3b213d7eae8a73228fcc8fb2803421ffdacb35be35f9d5d242fe73714a90edca"
   ]
  ],
  "order": [
@@ -36,9 +40,12 @@
   ],
   [
    "delta-20261121T140559Z.tar.zst"
+  ],
+  [
+   "delta-20261121T144330Z.tar.zst"
   ]
  ],
- "updated": "20261121T140559Z",
+ "updated": "20261121T144330Z",
  "base": "20261121T112133Z",
  "previous": [
   [
