@@ -3,14 +3,21 @@
   [
    "base-20261123T130338Z.tar.zst.part00",
    "36622af26cb5c38c3894253efb67901b996b21b396047480f6c65fb03e38eb27"
+  ],
+  [
+   "delta-20261123T131309Z.tar.zst",
+   "ad9d530c2b23fb4a10b90f83895f924008acd618d48337c2353950f2b96efb3d"
   ]
  ],
  "order": [
   [
    "base-20261123T130338Z.tar.zst.part00"
+  ],
+  [
+   "delta-20261123T131309Z.tar.zst"
   ]
  ],
- "updated": "20261123T130338Z",
+ "updated": "20261123T131309Z",
  "base": "20261123T130338Z",
  "previous": [
   [
