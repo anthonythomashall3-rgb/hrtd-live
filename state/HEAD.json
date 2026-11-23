@@ -27,6 +27,10 @@
   [
    "delta-20261123T043901Z.tar.zst",
    "f303aeb1cb0f38db13a251982041fe65d35e81630bfc6dc5325fecc5f4e3b67c"
+  ],
+  [
+   "delta-20261123T052408Z.tar.zst",
+   "06091e6afb6b5cf26ace72aac0097d8b40203679637a8932273474db248e4205"
   ]
  ],
  "order": [
@@ -50,9 +54,12 @@
   ],
   [
    "delta-20261123T043901Z.tar.zst"
+  ],
+  [
+   "delta-20261123T052408Z.tar.zst"
   ]
  ],
- "updated": "20261123T043901Z",
+ "updated": "20261123T052408Z",
  "base": "20261123T000924Z",
  "previous": [
   [
