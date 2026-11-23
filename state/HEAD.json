@@ -27,6 +27,10 @@
   [
    "delta-20261123T113140Z.tar.zst",
    "0ef9a6f78e8e83771b151d67c06c749646b42fd5f1606a9da360ac451e8a2f68"
+  ],
+  [
+   "delta-20261123T121700Z.tar.zst",
+   "a1ec850b2c90337d7a7f02953470d3f25ee1e3f65d06ee2dab5ef9874eeff1ed"
   ]
  ],
  "order": [
@@ -50,9 +54,12 @@
   ],
   [
    "delta-20261123T113140Z.tar.zst"
+  ],
+  [
+   "delta-20261123T121700Z.tar.zst"
   ]
  ],
- "updated": "20261123T113140Z",
+ "updated": "20261123T121700Z",
  "base": "20261123T060935Z",
  "previous": [
   [
