@@ -19,6 +19,10 @@
   [
    "delta-20261123T180308Z.tar.zst",
    "4d503fd53614cbb912ee29d94d8362682b30298f499ffd42e0d6e4f01318780e"
+  ],
+  [
+   "delta-20261123T180553Z.tar.zst",
+   "aad509bf8b56d06e2d3f638e3a9bc645a062998a400749189c4787db833695ed"
   ]
  ],
  "order": [
@@ -36,9 +40,12 @@
   ],
   [
    "delta-20261123T180308Z.tar.zst"
+  ],
+  [
+   "delta-20261123T180553Z.tar.zst"
   ]
  ],
- "updated": "20261123T180308Z",
+ "updated": "20261123T180553Z",
  "base": "20261123T153641Z",
  "previous": [
   [
