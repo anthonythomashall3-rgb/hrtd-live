@@ -3,14 +3,21 @@
   [
    "base-20261123T060935Z.tar.zst.part00",
    "4ab495f261f018d8303df7742ab94cc5f3c466bd103c86804d6fd50e90d5d18d"
+  ],
+  [
+   "delta-20261123T065511Z.tar.zst",
+   "9bf52de24b6eb7c9560f6aeb97b4e1c6515a050485ca7a0635414f327ec54389"
   ]
  ],
  "order": [
   [
    "base-20261123T060935Z.tar.zst.part00"
+  ],
+  [
+   "delta-20261123T065511Z.tar.zst"
   ]
  ],
- "updated": "20261123T060935Z",
+ "updated": "20261123T065511Z",
  "base": "20261123T060935Z",
  "previous": [
   [
