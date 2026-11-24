@@ -19,6 +19,10 @@
   [
    "delta-20261124T174522Z.tar.zst",
    "0f56ad3f8172b5579815ef8e7100a21f374c779ddfd251fa2816e83ed5db999c"
+  ],
+  [
+   "delta-20261124T175201Z.tar.zst",
+   "512f6f438656acc413df3004b5941a4a523615fae15abf66764110d2eff12573"
   ]
  ],
  "order": [
@@ -36,9 +40,12 @@
   ],
   [
    "delta-20261124T174522Z.tar.zst"
+  ],
+  [
+   "delta-20261124T175201Z.tar.zst"
   ]
  ],
- "updated": "20261124T174522Z",
+ "updated": "20261124T175201Z",
  "base": "20261124T172653Z",
  "previous": [
   [
