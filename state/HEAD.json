@@ -3,14 +3,21 @@
   [
    "base-20261124T190725Z.tar.zst.part00",
    "9c5e759de9b80490d8dd5ce937559d02901ec6de25525ba76820bff2542dcf63"
+  ],
+  [
+   "delta-20261124T193000Z.tar.zst",
+   "d8c8437d0b69573b0e23da24748df435ed8fa2b1b0245ecc41453cb99236df59"
   ]
  ],
  "order": [
   [
    "base-20261124T190725Z.tar.zst.part00"
+  ],
+  [
+   "delta-20261124T193000Z.tar.zst"
   ]
  ],
- "updated": "20261124T190725Z",
+ "updated": "20261124T193000Z",
  "base": "20261124T190725Z",
  "previous": [
   [
