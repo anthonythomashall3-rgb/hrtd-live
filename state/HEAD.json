@@ -27,6 +27,10 @@
   [
    "delta-20261124T205144Z.tar.zst",
    "1d55bbb7300e260d9c71523472e7d79178e162ea13d38e68ff1d47d0e51416b9"
+  ],
+  [
+   "delta-20261124T205953Z.tar.zst",
+   "6ddf5fff02cba50f9c2d32b86d80e527e6ae3f1c8471d664ef360b185aeea03d"
   ]
  ],
  "order": [
@@ -50,9 +54,12 @@
   ],
   [
    "delta-20261124T205144Z.tar.zst"
+  ],
+  [
+   "delta-20261124T205953Z.tar.zst"
   ]
  ],
- "updated": "20261124T205144Z",
+ "updated": "20261124T205953Z",
  "base": "20261124T190725Z",
  "previous": [
   [
