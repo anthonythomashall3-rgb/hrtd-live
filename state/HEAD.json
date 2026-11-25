@@ -3,14 +3,21 @@
   [
    "base-20261125T055127Z.tar.zst.part00",
    "acf7095dbe4b3783a40eb6a0b356443958ad148095777ec16ae82c79d106cbf0"
+  ],
+  [
+   "delta-20261125T055915Z.tar.zst",
+   "42af58a65fec6ac124cbdefd852e9d492b9218ee07025511c45d240463d0419c"
   ]
  ],
  "order": [
   [
    "base-20261125T055127Z.tar.zst.part00"
+  ],
+  [
+   "delta-20261125T055915Z.tar.zst"
   ]
  ],
- "updated": "20261125T055127Z",
+ "updated": "20261125T055915Z",
  "base": "20261125T055127Z",
  "previous": [
   [
