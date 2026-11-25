@@ -31,6 +31,10 @@
   [
    "delta-20261125T145523Z.tar.zst",
    "af213f48e23d75a4bcb4a0cadd7059715967dfb64246b8a6ff5b9020d35f28e0"
+  ],
+  [
+   "delta-20261125T150003Z.tar.zst",
+   "388c7bed0609507d6bf6ca9bc08eb6e655ff26a1ff9f9d6efe99f7bed5e38fe2"
   ]
  ],
  "order": [
@@ -57,9 +61,12 @@
   ],
   [
    "delta-20261125T145523Z.tar.zst"
+  ],
+  [
+   "delta-20261125T150003Z.tar.zst"
   ]
  ],
- "updated": "20261125T145523Z",
+ "updated": "20261125T150003Z",
  "base": "20261125T142212Z",
  "previous": [
   [
