@@ -3,14 +3,21 @@
   [
    "base-20261125T171506Z.tar.zst.part00",
    "fb0af4fa6e6ab822fa64931ec281ba79285a8b975140a4fd390a52f58fb019ca"
+  ],
+  [
+   "delta-20261125T172245Z.tar.zst",
+   "d7c075d66ec2bbb370b1309bdb0ce78a54a3055ae3bcc78a1df249080d79a1f7"
   ]
  ],
  "order": [
   [
    "base-20261125T171506Z.tar.zst.part00"
+  ],
+  [
+   "delta-20261125T172245Z.tar.zst"
   ]
  ],
- "updated": "20261125T171506Z",
+ "updated": "20261125T172245Z",
  "base": "20261125T171506Z",
  "previous": [
   [
