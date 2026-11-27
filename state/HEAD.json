@@ -15,6 +15,10 @@
   [
    "delta-20261127T075502Z.tar.zst",
    "2af991123b3b101c93ef149647823c54355bad2d4b9f3356117bbe71ab22c2f9"
+  ],
+  [
+   "delta-20261127T084133Z.tar.zst",
+   "922feb751a2cd112a3e884baa84f414d9c5ea94afd4eb657b5a8ad2c3d21bded"
   ]
  ],
  "order": [
@@ -29,9 +33,12 @@
   ],
   [
    "delta-20261127T075502Z.tar.zst"
+  ],
+  [
+   "delta-20261127T084133Z.tar.zst"
   ]
  ],
- "updated": "20261127T075502Z",
+ "updated": "20261127T084133Z",
  "base": "20261127T050307Z",
  "previous": [
   [
