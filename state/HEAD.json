@@ -15,6 +15,10 @@
   [
    "delta-20261127T160450Z.tar.zst",
    "0ba0b7d13b778322bf0e70152f2a61a5cfa4b699672096381916b3c44c4f43ca"
+  ],
+  [
+   "delta-20261127T165108Z.tar.zst",
+   "587d5316fcf3df30ebefe1aa1a841a04d8f695ff1148f5597893344288113d19"
   ]
  ],
  "order": [
@@ -29,9 +33,12 @@
   ],
   [
    "delta-20261127T160450Z.tar.zst"
+  ],
+  [
+   "delta-20261127T165108Z.tar.zst"
   ]
  ],
- "updated": "20261127T160450Z",
+ "updated": "20261127T165108Z",
  "base": "20261127T141808Z",
  "previous": [
   [
