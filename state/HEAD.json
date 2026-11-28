@@ -7,6 +7,10 @@
   [
    "delta-20261128T104310Z.tar.zst",
    "3fa38ac90c1c51fa63ad09ed6502d3e8c91c065911b81e66c38f03b3c5e49889"
+  ],
+  [
+   "delta-20261128T112822Z.tar.zst",
+   "2ca80e42ca0e8fbd3908d7bfde8ce3e903d1adb72ad71d5117a2bf64dd7a5e4f"
   ]
  ],
  "order": [
@@ -15,9 +19,12 @@
   ],
   [
    "delta-20261128T104310Z.tar.zst"
+  ],
+  [
+   "delta-20261128T112822Z.tar.zst"
   ]
  ],
- "updated": "20261128T104310Z",
+ "updated": "20261128T112822Z",
  "base": "20261128T095733Z",
  "previous": [
   [
