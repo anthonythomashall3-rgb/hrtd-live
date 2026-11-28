@@ -3,14 +3,21 @@
   [
    "base-20261128T144458Z.tar.zst.part00",
    "922527de526d949deb984c49e1d724e23b59b4508fcb38226f34099236a70e06"
+  ],
+  [
+   "delta-20261128T153102Z.tar.zst",
+   "b3f1d24caee443aa3476e086aa496786466369cfc52e424c35aaa4d1a8bd089e"
   ]
  ],
  "order": [
   [
    "base-20261128T144458Z.tar.zst.part00"
+  ],
+  [
+   "delta-20261128T153102Z.tar.zst"
   ]
  ],
- "updated": "20261128T144458Z",
+ "updated": "20261128T153102Z",
  "base": "20261128T144458Z",
  "previous": [
   [
