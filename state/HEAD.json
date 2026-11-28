@@ -1,6 +1,19 @@
 {
  "assets": [
   [
+   "base-20261128T061422Z.tar.zst.part00",
+   "a9833016f2e301b8990a89c4faeea990f4db0c9731241540680fbc59173da335"
+  ]
+ ],
+ "order": [
+  [
+   "base-20261128T061422Z.tar.zst.part00"
+  ]
+ ],
+ "updated": "20261128T061422Z",
+ "base": "20261128T061422Z",
+ "previous": [
+  [
    "base-20261128T051447Z.tar.zst.part00",
    "129c35fa30cdf994bf34463130de93821a97df7664766a5ec58b5d0535fa1c12"
   ],
@@ -35,75 +48,6 @@
   [
    "delta-20261128T061413Z.tar.zst",
    "982f64683929a7a582a62887b1f46c2766831239a7b85451f3643be4e177416e"
-  ]
- ],
- "order": [
-  [
-   "base-20261128T051447Z.tar.zst.part00"
-  ],
-  [
-   "delta-20261128T052225Z.tar.zst"
-  ],
-  [
-   "delta-20261128T052946Z.tar.zst"
-  ],
-  [
-   "delta-20261128T053718Z.tar.zst"
-  ],
-  [
-   "delta-20261128T054443Z.tar.zst"
-  ],
-  [
-   "delta-20261128T055208Z.tar.zst"
-  ],
-  [
-   "delta-20261128T055932Z.tar.zst"
-  ],
-  [
-   "delta-20261128T060701Z.tar.zst"
-  ],
-  [
-   "delta-20261128T061413Z.tar.zst"
-  ]
- ],
- "updated": "20261128T061413Z",
- "base": "20261128T051447Z",
- "previous": [
-  [
-   "base-20261128T021651Z.tar.zst.part00",
-   "744ba4521d0025c402b97f9404eaf57386b3b6c39fffb554f1a12030e4d3bd51"
-  ],
-  [
-   "delta-20261128T022425Z.tar.zst",
-   "5a9e468574e232feafa8b4320af46eba73f04a1c9aa6318f690a91240ae61c13"
-  ],
-  [
-   "delta-20261128T030952Z.tar.zst",
-   "f4206e31e30ef6260139eea6693b5797ce1479a7ffa53724fa9a45b975991878"
-  ],
-  [
-   "delta-20261128T035506Z.tar.zst",
-   "39b50a1a003d957be91b4a3dfaf705ee93222b4971fefc1d43a04e9da58a402c"
-  ],
-  [
-   "delta-20261128T044026Z.tar.zst",
-   "258c05a46215eb6215dd077ade01ad95c20469f181d1a166e8dd13fa35ec689d"
-  ],
-  [
-   "delta-20261128T044609Z.tar.zst",
-   "002534d742a598231b9fad16c0ddc01f502675759c2f4bb37d7c5f0fdb10a7b4"
-  ],
-  [
-   "delta-20261128T045945Z.tar.zst",
-   "5107250aa2b90f401e9bbbf143aa516e73df8dbce17bd196534dce3d7da1804d"
-  ],
-  [
-   "delta-20261128T050710Z.tar.zst",
-   "8051e5043529ff0d44cabe9efd94bf6d64a8a447978141fb518f4db536c56925"
-  ],
-  [
-   "delta-20261128T051434Z.tar.zst",
-   "cc81e0a1931dd5e78ad4ec77b130cb12fde55d7c7b70598709233fbc963b3603"
   ]
  ]
 }
