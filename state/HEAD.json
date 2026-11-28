@@ -3,14 +3,21 @@
   [
    "base-20261128T095733Z.tar.zst.part00",
    "edd56cffc67591d7dd52bbee400ad8db3985bb21120019e417c3985dae57e6ba"
+  ],
+  [
+   "delta-20261128T104310Z.tar.zst",
+   "3fa38ac90c1c51fa63ad09ed6502d3e8c91c065911b81e66c38f03b3c5e49889"
   ]
  ],
  "order": [
   [
    "base-20261128T095733Z.tar.zst.part00"
+  ],
+  [
+   "delta-20261128T104310Z.tar.zst"
   ]
  ],
- "updated": "20261128T095733Z",
+ "updated": "20261128T104310Z",
  "base": "20261128T095733Z",
  "previous": [
   [
