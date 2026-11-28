@@ -27,6 +27,10 @@
   [
    "delta-20261128T082651Z.tar.zst",
    "9af1015a9d3b981234a1a29312ad6cae503601c79b208918e6dd286923e1a53d"
+  ],
+  [
+   "delta-20261128T091213Z.tar.zst",
+   "6dbc032d569e6050ac8436867661ba32ead56fdbc1b2ed720dca22403c490618"
   ]
  ],
  "order": [
@@ -50,9 +54,12 @@
   ],
   [
    "delta-20261128T082651Z.tar.zst"
+  ],
+  [
+   "delta-20261128T091213Z.tar.zst"
   ]
  ],
- "updated": "20261128T082651Z",
+ "updated": "20261128T091213Z",
  "base": "20261128T061422Z",
  "previous": [
   [
